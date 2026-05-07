@@ -1,0 +1,151 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ isEdit ? 'Modifier l\'examen' : 'Nouvel examen' }}</h1>
+      <p class="page-subtitle">{{ isEdit ? exam.codeExam : 'Créez votre examen avec questions et réponses' }}</p>
+    </div>
+    <a routerLink="/exams" class="btn-outline">← Retour</a>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">Chargement...</div>
+
+  <div *ngIf="!loading">
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+    <form (ngSubmit)="onSubmit()" #examForm="ngForm">
+
+      <!-- ── Infos générales ── -->
+      <div class="form-section">
+        <h2 class="section-title">Informations générales</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" name="description" [(ngModel)]="exam.description"
+              placeholder="Description de l'examen" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label>Statut</label>
+            <select name="status" [(ngModel)]="exam.status" class="form-control">
+              <option value="CREATED">Créé</option>
+              <option value="ACTIVATED">Activé</option>
+              <option value="SUSPENDED">Suspendu</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Questions ── -->
+      <div class="form-section">
+        <h2 class="section-title">Questions ({{ exam.questionDTOList?.length || 0 }})</h2>
+
+        <div class="empty-questions" *ngIf="!exam.questionDTOList?.length">
+          <p>Aucune question. Cliquez sur le bouton ci-dessous pour commencer.</p>
+        </div>
+
+        <div class="question-card" *ngFor="let question of exam.questionDTOList; let qi = index">
+
+          <div class="question-header">
+            <span class="question-number">Q{{ qi + 1 }}</span>
+            <button type="button" class="btn-icon danger" title="Supprimer" (click)="removeQuestion(qi)">✕</button>
+          </div>
+
+          <div class="form-group">
+            <label>Contenu de la question</label>
+            <textarea [name]="'qContent' + qi" [(ngModel)]="question.questionContent"
+              placeholder="Écrivez votre question ici..." class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Description (optionnelle)</label>
+            <input type="text" [name]="'qDesc' + qi" [(ngModel)]="question.description"
+              placeholder="Indice ou explication..." class="form-control" />
+          </div>
+
+          <!-- ── Réponses ── -->
+          <div class="answers-section">
+            <div class="answers-header">
+              <span class="answers-label">Réponses</span>
+            </div>
+
+            <div class="answer-item" *ngFor="let answer of question.answers; let ai = index">
+              <input type="text" [name]="'aContent' + qi + '_' + ai" [(ngModel)]="answer.answerContent"
+                placeholder="Contenu de la réponse" class="form-control" required />
+
+              <select [name]="'aStatus' + qi + '_' + ai" [(ngModel)]="answer.answerStatus"
+                class="status-select" [ngClass]="answer.answerStatus === 'CORRECT' ? 'correct' : 'wrong'">
+                <option value="CORRECT">✓ Correcte</option>
+                <option value="WRONG">✗ Incorrecte</option>
+              </select>
+
+              <!-- Bouton MAJ réponse — utilise getAnswerState() sans ?. -->
+              <button
+                type="button"
+                class="btn-maj"
+                [ngClass]="{
+                  'saving': getAnswerState(qi, ai).saving,
+                  'saved':  getAnswerState(qi, ai).saved,
+                  'error':  getAnswerState(qi, ai).error
+                }"
+                [disabled]="getAnswerState(qi, ai).saving"
+                (click)="answer.codeAnswer ? updateAnswer(answer, qi, ai) : saveAnswer(answer, question, qi, ai)"
+                [title]="answer.codeAnswer ? 'Mettre à jour la réponse' : 'Enregistrer la réponse'"
+              >
+                <span *ngIf="!getAnswerState(qi, ai).saving && !getAnswerState(qi, ai).saved && !getAnswerState(qi, ai).error">
+                  {{ answer.codeAnswer ? 'MAJ' : '💾' }}
+                </span>
+                <span *ngIf="getAnswerState(qi, ai).saving">⏳</span>
+                <span *ngIf="getAnswerState(qi, ai).saved">✓</span>
+                <span *ngIf="getAnswerState(qi, ai).error">✗</span>
+              </button>
+
+              <button type="button" class="btn-icon danger" title="Supprimer la réponse" (click)="removeAnswer(question, ai)">✕</button>
+            </div>
+
+            <button type="button" class="btn-add-inline" (click)="addAnswer(question)">
+              + Ajouter une réponse
+            </button>
+          </div>
+
+          <!-- ── Actions question — utilise getQuestionState() sans ?. ── -->
+          <div class="question-actions">
+            <button
+              type="button"
+              class="btn-save-question"
+              [ngClass]="{
+                'saving': getQuestionState(qi).saving,
+                'saved':  getQuestionState(qi).saved,
+                'error':  getQuestionState(qi).error
+              }"
+              [disabled]="getQuestionState(qi).saving || !question.questionContent"
+              (click)="question.codeQuestion ? updateQuestion(question, qi) : saveQuestion(question, qi)"
+            >
+              <span *ngIf="!getQuestionState(qi).saving && !getQuestionState(qi).saved && !getQuestionState(qi).error">
+                {{ question.codeQuestion ? '✎ MAJ question' : '💾 Enregistrer la question' }}
+              </span>
+              <span *ngIf="getQuestionState(qi).saving">⏳ Enregistrement...</span>
+              <span *ngIf="getQuestionState(qi).saved">✓ Enregistré !</span>
+              <span *ngIf="getQuestionState(qi).error">✗ Erreur</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Bouton Ajouter une question EN BAS -->
+        <button type="button" class="btn-add-question" (click)="addQuestion()">
+          + Ajouter une question
+        </button>
+      </div>
+
+      <!-- ── Actions globales ── -->
+      <div class="form-actions">
+        <a routerLink="/exams" class="btn-outline">Annuler</a>
+        <button type="submit" class="btn-primary" [disabled]="saving">
+          {{ saving ? 'Enregistrement...' : (isEdit ? 'Mettre à jour l\'examen' : 'Créer l\'examen') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

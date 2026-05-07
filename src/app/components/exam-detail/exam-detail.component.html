@@ -1,0 +1,92 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <div *ngIf="loading" class="loading-state">Chargement...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && exam">
+    <div class="page-header">
+      <div>
+        <code class="exam-code-large">{{ exam.codeExam }}</code>
+        <h1 class="page-title">{{ exam.description }}</h1>
+        <span class="status-badge" [ngClass]="exam.status?.toLowerCase()">{{ exam.status }}</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="startTest()">▶ Passer le test</button>
+        <a [routerLink]="['/exams', exam.codeExam, 'edit']" class="btn-secondary">✎ Modifier</a>
+        <a routerLink="/exams" class="btn-outline">← Retour</a>
+      </div>
+    </div>
+
+    <!-- Infos -->
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="info-icon">📝</span>
+        <span class="info-value">{{ exam.numberOfQuestions || 0 }}</span>
+        <span class="info-label">Questions</span>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">📅</span>
+        <span class="info-value">{{ exam.dateCreation | date:'dd/MM/yy' }}</span>
+        <span class="info-label">Créé le</span>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">🏆</span>
+        <span class="info-value">{{ bestScore?.bestScore ?? '—' }}</span>
+        <span class="info-label">Meilleur score</span>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">👤</span>
+        <span class="info-value">{{ bestScore?.name ?? '—' }}</span>
+        <span class="info-label">Champion</span>
+      </div>
+    </div>
+
+    <!-- Questions list -->
+    <div class="section">
+      <h2 class="section-title">Questions de l'examen</h2>
+      <div *ngIf="!exam.questionDTOList?.length" class="empty-state">
+        Aucune question dans cet examen.
+      </div>
+      <div class="question-list">
+        <div class="question-item" *ngFor="let q of exam.questionDTOList; let i = index">
+          <div class="question-num">{{ i + 1 }}</div>
+          <div class="question-body">
+            <p class="question-text">{{ q.questionContent }}</p>
+            <div class="answers-preview">
+              <span class="answer-chip" *ngFor="let a of q.answers"
+                [ngClass]="a.answerStatus === 'CORRECT' ? 'correct' : 'wrong'">
+                {{ a.answerContent }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tests history -->
+    <div class="section" *ngIf="allTests.length > 0">
+      <h2 class="section-title">Historique des tests</h2>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Test ID</th>
+              <th>Candidat</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of allTests">
+              <td><code>{{ t.testId }}</code></td>
+              <td>{{ t.userNameTest }}</td>
+              <td>
+                <span class="score-badge">{{ t.score }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">{{ lang.t('users.title') }}</h1>
+    <button class="btn-primary" (click)="showForm = !showForm">{{ lang.t('users.add') }}</button>
+  </div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <div class="form-section" *ngIf="showForm && !editingUser">
+    <h2 class="section-title">{{ lang.t('users.new_title') }}</h2>
+    <form (ngSubmit)="saveUser()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ lang.t('users.name') }}</label>
+          <input type="text" [(ngModel)]="newUser.name" name="name" class="form-control" required [placeholder]="lang.t('users.name_ph')" />
+        </div>
+        <div class="form-group">
+          <label>{{ lang.t('users.email') }}</label>
+          <input type="email" [(ngModel)]="newUser.email" name="email" class="form-control" required [placeholder]="lang.t('users.email_ph')" />
+        </div>
+        <div class="form-group">
+          <label>{{ lang.t('users.password') }}</label>
+          <input type="password" [(ngModel)]="newUser.password" name="password" class="form-control" required placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-outline" (click)="showForm = false">{{ lang.t('users.cancel') }}</button>
+        <button type="submit" class="btn-primary">{{ lang.t('users.create') }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="form-section" *ngIf="editingUser">
+    <h2 class="section-title">{{ lang.t('users.edit_title') }}</h2>
+    <form (ngSubmit)="saveUser()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>{{ lang.t('users.name') }}</label>
+          <input type="text" [(ngModel)]="editingUser.name" name="editName" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label>{{ lang.t('users.email') }}</label>
+          <input type="email" [(ngModel)]="editingUser.email" name="editEmail" class="form-control" required />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-outline" (click)="cancelEdit()">{{ lang.t('users.cancel') }}</button>
+        <button type="submit" class="btn-primary">{{ lang.t('users.update') }}</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">{{ lang.t('users.loading') }}</div>
+  <div class="table-container" *ngIf="!loading">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>{{ lang.t('users.name') }}</th>
+          <th>{{ lang.t('users.email') }}</th>
+          <th>{{ lang.t('exams.actions') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon" (click)="startEdit(user)">✎</button>
+            <button class="btn-icon danger" (click)="deleteUser(getUserId(user))">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

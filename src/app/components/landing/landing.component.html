@@ -1,0 +1,105 @@
+<app-navbar></app-navbar>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">{{ lang.t('landing.badge') }}</div>
+    <h1 class="hero-title">
+      {{ lang.t('landing.title1') }}<br>
+      <span class="hero-highlight">{{ lang.t('landing.title2') }}</span>
+      {{ lang.t('landing.title3') }}
+    </h1>
+    <p class="hero-subtitle">{{ lang.t('landing.subtitle') }}</p>
+    <div class="hero-actions">
+      <a routerLink="/register" class="btn-primary btn-lg">{{ lang.t('landing.start') }}</a>
+      <a routerLink="/login" class="btn-ghost btn-lg">{{ lang.t('landing.signin') }}</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="stat-val">100%</span><span class="stat-desc">{{ lang.t('landing.stat1') }}</span></div>
+      <div class="stat-divider"></div>
+      <div class="hero-stat"><span class="stat-val">∞</span><span class="stat-desc">{{ lang.t('landing.stat2') }}</span></div>
+      <div class="stat-divider"></div>
+      <div class="hero-stat"><span class="stat-val">QCM</span><span class="stat-desc">{{ lang.t('landing.stat3') }}</span></div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="visual-card card-main">
+      <div class="card-header-visual">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+      </div>
+      <div class="card-exam-title">📝 Examen de Mathématiques</div>
+      <div class="card-question">Question 3/10</div>
+      <div class="card-q-text">Quelle est la dérivée de x² ?</div>
+      <div class="card-answers">
+        <div class="card-answer">A. x</div>
+        <div class="card-answer selected">B. 2x ✓</div>
+        <div class="card-answer">C. x²</div>
+        <div class="card-answer">D. 2</div>
+      </div>
+      <div class="card-progress-bar"><div class="card-progress-fill" style="width:30%"></div></div>
+    </div>
+    <div class="visual-card card-score">
+      <div class="score-emoji">🏆</div>
+      <div class="score-big">85%</div>
+      <div class="score-sub">Score obtenu</div>
+    </div>
+    <div class="visual-card card-stat">
+      <div class="mini-stat">✅ 8 correctes</div>
+      <div class="mini-stat wrong">❌ 2 échouées</div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-container">
+    <div class="section-label">{{ lang.t('landing.feat.label') }}</div>
+    <h2 class="features-title">{{ lang.t('landing.feat.title') }}</h2>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon" style="background:#eff6ff;color:#2563eb">📋</div><h3>{{ lang.t('nav.exams') }}</h3><p>{{ lang.t('landing.subtitle') }}</p></div>
+      <div class="feature-card"><div class="feature-icon" style="background:#f0fdf4;color:#16a34a">⚡</div><h3>{{ lang.t('landing.stat3') }}</h3><p>{{ lang.t('landing.step2.desc') }}</p></div>
+      <div class="feature-card"><div class="feature-icon" style="background:#fefce8;color:#ca8a04">📊</div><h3>{{ lang.t('landing.step3.title') }}</h3><p>{{ lang.t('landing.step3.desc') }}</p></div>
+      <div class="feature-card"><div class="feature-icon" style="background:#fdf4ff;color:#9333ea">🏆</div><h3>{{ lang.t('dashboard.popular') }}</h3><p>{{ lang.t('landing.step3.desc') }}</p></div>
+      <div class="feature-card"><div class="feature-icon" style="background:#fff1f2;color:#e11d48">🔒</div><h3>{{ lang.t('form.status') }}</h3><p>{{ lang.t('landing.step1.desc') }}</p></div>
+      <div class="feature-card"><div class="feature-icon" style="background:#f0f9ff;color:#0284c7">👥</div><h3>{{ lang.t('users.title') }}</h3><p>{{ lang.t('landing.subtitle') }}</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how-it-works">
+  <div class="how-container">
+    <div class="section-label">{{ lang.t('landing.how.label') }}</div>
+    <h2 class="features-title">{{ lang.t('landing.how.title') }}</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content"><h3>{{ lang.t('landing.step1.title') }}</h3><p>{{ lang.t('landing.step1.desc') }}</p></div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content"><h3>{{ lang.t('landing.step2.title') }}</h3><p>{{ lang.t('landing.step2.desc') }}</p></div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content"><h3>{{ lang.t('landing.step3.title') }}</h3><p>{{ lang.t('landing.step3.desc') }}</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-card">
+    <h2>{{ lang.t('landing.cta.title') }}</h2>
+    <p>{{ lang.t('landing.cta.desc') }}</p>
+    <div class="cta-actions">
+      <a routerLink="/register" class="btn-primary btn-lg">{{ lang.t('landing.cta.btn') }}</a>
+      <a routerLink="/login" class="btn-ghost btn-lg">{{ lang.t('landing.cta.already') }}</a>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-footer">
+  <div class="footer-brand"><span class="brand-icon">⬡</span><span>ExamPlatform</span></div>
+  <p class="footer-copy">{{ lang.t('landing.footer') }}</p>
+</footer>

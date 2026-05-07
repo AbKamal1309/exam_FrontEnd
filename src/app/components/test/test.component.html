@@ -1,0 +1,57 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+  <div *ngIf="loading" class="loading-state">Chargement du test...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && testExam">
+    <div class="test-header">
+      <div>
+        <h1 class="page-title">{{ testExam.examDTO?.description }}</h1>
+        <p class="page-subtitle">Candidat : <strong>{{ testExam.userRequestName }}</strong> | Examinateur : <strong>{{ testExam.userNameExamSetter }}</strong></p>
+      </div>
+      <div class="progress-info">
+        <span>{{ objectKeys(selectedAnswers).length }}/{{ questions.length }} réponses</span>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="questions-container">
+      <div class="test-question" *ngFor="let q of questions; let qi = index">
+        <div class="question-header-test">
+          <span class="question-badge">Question {{ qi + 1 }}/{{ questions.length }}</span>
+          <span class="answered-check" *ngIf="selectedAnswers[qi] !== undefined">✓</span>
+        </div>
+        <p class="question-text">{{ q.questionContent }}</p>
+        <p class="question-hint" *ngIf="q.description">💡 {{ q.description }}</p>
+
+        <div class="answers-list">
+          <div
+            class="answer-option"
+            *ngFor="let a of q.answers; let ai = index"
+            [ngClass]="{ 'selected': selectedAnswers[qi] === ai }"
+            (click)="selectAnswer(qi, ai)"
+          >
+            <span class="answer-letter">{{ 'ABCD'[ai] }}</span>
+            <span class="answer-text">{{ a.answerContent }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-footer">
+      <div *ngIf="!allAnswered" class="warning-text">
+        ⚠ Veuillez répondre à toutes les questions avant de soumettre.
+      </div>
+      <button
+        class="btn-primary btn-lg"
+        [disabled]="!allAnswered || submitting"
+        (click)="submitTest()"
+      >
+        {{ submitting ? 'Envoi en cours...' : '✓ Soumettre le test' }}
+      </button>
+    </div>
+  </div>
+</div>

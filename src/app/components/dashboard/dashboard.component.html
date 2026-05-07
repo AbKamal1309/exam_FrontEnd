@@ -1,0 +1,78 @@
+<app-navbar></app-navbar>
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ lang.t('dashboard.title') }}</h1>
+      <p class="page-subtitle">{{ lang.t('dashboard.welcome') }} <strong>{{ auth.currentUser?.name }}</strong></p>
+    </div>
+    <a routerLink="/exams/new" class="btn-primary">{{ lang.t('dashboard.new_exam') }}</a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card activated">
+      <div class="stat-icon">✓</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ activatedCount }}</span>
+        <span class="stat-label">{{ lang.t('dashboard.activated') }}</span>
+      </div>
+    </div>
+    <div class="stat-card created">
+      <div class="stat-icon">✎</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ createdCount }}</span>
+        <span class="stat-label">{{ lang.t('dashboard.created') }}</span>
+      </div>
+    </div>
+    <div class="stat-card suspended">
+      <div class="stat-icon">⏸</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ suspendedCount }}</span>
+        <span class="stat-label">{{ lang.t('dashboard.suspended') }}</span>
+      </div>
+    </div>
+    <div class="stat-card total">
+      <div class="stat-icon">☰</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ myExams.length }}</span>
+        <span class="stat-label">{{ lang.t('dashboard.total') }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">{{ lang.t('dashboard.recent') }}</h2>
+    <div *ngIf="loading" class="loading-state">{{ lang.t('dashboard.loading') }}</div>
+    <div *ngIf="!loading && myExams.length === 0" class="empty-state">
+      <p>{{ lang.t('dashboard.empty') }}</p>
+      <a routerLink="/exams/new" class="btn-primary">{{ lang.t('dashboard.first') }}</a>
+    </div>
+    <div class="exams-grid" *ngIf="!loading && myExams.length > 0">
+      <div class="exam-card" *ngFor="let exam of myExams.slice(0,6)">
+        <div class="exam-card-header">
+          <span class="exam-code">{{ exam.codeExam }}</span>
+          <span class="status-badge" [ngClass]="exam.status?.toLowerCase()">{{ lang.t('status.' + exam.status) }}</span>
+        </div>
+        <p class="exam-desc">{{ exam.description || '—' }}</p>
+        <div class="exam-meta">
+          <span>📝 {{ exam.numberOfQuestions || 0 }} {{ lang.t('dashboard.questions') }}</span>
+          <span>📅 {{ exam.dateCreation | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="exam-actions">
+          <a [routerLink]="['/exams', exam.codeExam]" class="btn-secondary">{{ lang.t('dashboard.see') }}</a>
+          <a [routerLink]="['/exams', exam.codeExam, 'edit']" class="btn-outline">{{ lang.t('dashboard.edit') }}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" *ngIf="popularExams.length > 0">
+    <h2 class="section-title">{{ lang.t('dashboard.popular') }}</h2>
+    <div class="popular-list">
+      <div class="popular-item" *ngFor="let exam of popularExams; let i = index">
+        <span class="popular-rank">#{{ i + 1 }}</span>
+        <span class="popular-name">{{ exam }}</span>
+        <a [routerLink]="['/exams', exam]" class="btn-outline small">{{ lang.t('dashboard.see') }}</a>
+      </div>
+    </div>
+  </div>
+</div>
