@@ -4,8 +4,6 @@ import { AuthService } from '../../services/auth.service';
 import { LangService } from '../../services/lang.service';
 import { CommonModule } from '@angular/common';
 
-const ADMIN_EMAIL = 'Kamal@gmail.com';
-
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -20,15 +18,17 @@ const ADMIN_EMAIL = 'Kamal@gmail.com';
 
       <div class="nav-links" *ngIf="auth.isLoggedIn">
         <a routerLink="/dashboard" routerLinkActive="active">{{ lang.t('nav.dashboard') }}</a>
-        <a routerLink="/exams"     routerLinkActive="active">{{ lang.t('nav.exams') }}</a>
-        <a routerLink="/users"     routerLinkActive="active" *ngIf="isAdmin">{{ lang.t('nav.users') }}</a>
+        <a routerLink="/exams" routerLinkActive="active">{{ lang.t('nav.exams') }}</a>
+        <a routerLink="/groups" routerLinkActive="active">{{ lang.t('nav.groups') }}</a>
+        <a routerLink="/admin" *ngIf="auth.isAdmin">🛡️ {{ lang.t('nav.admin') }}</a>
       </div>
 
       <div class="nav-right">
 
         <!-- Bouton langue -->
         <button class="btn-lang" (click)="lang.toggle()" [title]="lang.isRtl ? 'Passer en français' : 'التبديل إلى العربية'">
-          <span class="lang-flag">{{ lang.isRtl ? '🇫🇷' : '🇲🇦' }}</span>
+          <!--          <span class="lang-flag">{{ lang.isRtl ? '🇫🇷' : '🇲🇦' }}</span>-->
+
           <span class="lang-label">{{ lang.isRtl ? 'FR' : 'AR' }}</span>
         </button>
 
@@ -60,7 +60,6 @@ export class NavbarComponent {
     document.documentElement.lang = lang.lang();
   }
 
-  get isAdmin(): boolean   { return this.auth.currentUser?.email === ADMIN_EMAIL; }
   get userInitial(): string { return this.auth.currentUser?.name?.charAt(0).toUpperCase() ?? '?'; }
 
   logout() {

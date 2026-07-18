@@ -1,78 +1,321 @@
-<app-navbar></app-navbar>
-<div class="page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">{{ lang.t('dashboard.title') }}</h1>
-      <p class="page-subtitle">{{ lang.t('dashboard.welcome') }} <strong>{{ auth.currentUser?.name }}</strong></p>
-    </div>
-    <a routerLink="/exams/new" class="btn-primary">{{ lang.t('dashboard.new_exam') }}</a>
-  </div>
+<div>
+    <app-navbar></app-navbar>
 
-  <div class="stats-grid">
-    <div class="stat-card activated">
-      <div class="stat-icon">✓</div>
-      <div class="stat-info">
-        <span class="stat-number">{{ activatedCount }}</span>
-        <span class="stat-label">{{ lang.t('dashboard.activated') }}</span>
-      </div>
-    </div>
-    <div class="stat-card created">
-      <div class="stat-icon">✎</div>
-      <div class="stat-info">
-        <span class="stat-number">{{ createdCount }}</span>
-        <span class="stat-label">{{ lang.t('dashboard.created') }}</span>
-      </div>
-    </div>
-    <div class="stat-card suspended">
-      <div class="stat-icon">⏸</div>
-      <div class="stat-info">
-        <span class="stat-number">{{ suspendedCount }}</span>
-        <span class="stat-label">{{ lang.t('dashboard.suspended') }}</span>
-      </div>
-    </div>
-    <div class="stat-card total">
-      <div class="stat-icon">☰</div>
-      <div class="stat-info">
-        <span class="stat-number">{{ myExams.length }}</span>
-        <span class="stat-label">{{ lang.t('dashboard.total') }}</span>
-      </div>
-    </div>
-  </div>
+    <div class="page-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ lang.t('dashboard.title') }}</h1>
+                <p class="page-subtitle">{{ lang.t('dashboard.welcome') }} {{ auth.currentUser?.name }}</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" (click)="openJoinGroupModal()">
+                    🔗 {{ lang.t('dashboard.join_group') }}
+                </button>
+                <button class="btn-primary" routerLink="/exams/new">
+                    + {{ lang.t('dashboard.new_exam') }}
+                </button>
+            </div>
+        </div>
 
-  <div class="section">
-    <h2 class="section-title">{{ lang.t('dashboard.recent') }}</h2>
-    <div *ngIf="loading" class="loading-state">{{ lang.t('dashboard.loading') }}</div>
-    <div *ngIf="!loading && myExams.length === 0" class="empty-state">
-      <p>{{ lang.t('dashboard.empty') }}</p>
-      <a routerLink="/exams/new" class="btn-primary">{{ lang.t('dashboard.first') }}</a>
-    </div>
-    <div class="exams-grid" *ngIf="!loading && myExams.length > 0">
-      <div class="exam-card" *ngFor="let exam of myExams.slice(0,6)">
-        <div class="exam-card-header">
-          <span class="exam-code">{{ exam.codeExam }}</span>
-          <span class="status-badge" [ngClass]="exam.status?.toLowerCase()">{{ lang.t('status.' + exam.status) }}</span>
+        <!-- Statistiques -->
+        <div class="stats-grid">
+            <div class="stat-card activated">
+                <span class="stat-icon">✅</span>
+                <div><span class="stat-number">{{ activatedCount }}</span><span class="stat-label">{{ lang.t('dashboard.activated') }}</span></div>
+            </div>
+            <div class="stat-card created">
+                <span class="stat-icon">📝</span>
+                <div><span class="stat-number">{{ createdCount }}</span><span class="stat-label">{{ lang.t('dashboard.created') }}</span></div>
+            </div>
+            <div class="stat-card suspended">
+                <span class="stat-icon">⏸️</span>
+                <div><span class="stat-number">{{ suspendedCount }}</span><span class="stat-label">{{ lang.t('dashboard.suspended') }}</span></div>
+            </div>
+            <div class="stat-card total">
+                <span class="stat-icon">📊</span>
+                <div><span class="stat-number">{{ myExams.length }}</span><span class="stat-label">{{ lang.t('dashboard.total') }}</span></div>
+            </div>
         </div>
-        <p class="exam-desc">{{ exam.description || '—' }}</p>
-        <div class="exam-meta">
-          <span>📝 {{ exam.numberOfQuestions || 0 }} {{ lang.t('dashboard.questions') }}</span>
-          <span>📅 {{ exam.dateCreation | date:'dd/MM/yyyy' }}</span>
-        </div>
-        <div class="exam-actions">
-          <a [routerLink]="['/exams', exam.codeExam]" class="btn-secondary">{{ lang.t('dashboard.see') }}</a>
-          <a [routerLink]="['/exams', exam.codeExam, 'edit']" class="btn-outline">{{ lang.t('dashboard.edit') }}</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="section" *ngIf="popularExams.length > 0">
-    <h2 class="section-title">{{ lang.t('dashboard.popular') }}</h2>
-    <div class="popular-list">
-      <div class="popular-item" *ngFor="let exam of popularExams; let i = index">
-        <span class="popular-rank">#{{ i + 1 }}</span>
-        <span class="popular-name">{{ exam }}</span>
-        <a [routerLink]="['/exams', exam]" class="btn-outline small">{{ lang.t('dashboard.see') }}</a>
-      </div>
+        <!-- Mes examens (ceux que j'ai créés) -->
+        <div class="section">
+            <h2 class="section-title">{{ lang.t('dashboard.my_exams') }}</h2>
+            <div *ngIf="loading" class="loading-state">{{ lang.t('dashboard.loading') }}</div>
+            <div *ngIf="!loading && myExams.length === 0" class="empty-state">
+                <p>{{ lang.t('dashboard.empty') }}</p>
+                <button class="btn-primary" routerLink="/exams/new">{{ lang.t('dashboard.first') }}</button>
+            </div>
+            <div class="exams-grid" *ngIf="!loading && myExams.length > 0">
+                <div class="exam-card" *ngFor="let exam of myExams.slice(0, 6)">
+                    <div class="exam-card-header">
+                        <span class="exam-code">{{ exam.codeExam }}</span>
+                        <div class="header-right">
+                            <span class="status-badge"
+                                  [class.activated]="exam.status === 'ACTIVATED'"
+                                  [class.created]="exam.status === 'CREATED'"
+                                  [class.suspended]="exam.status === 'SUSPENDED'">
+                                {{ lang.t('status.' + exam.status) }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="exam-desc">{{ exam.description }}</div>
+                    <div class="exam-meta">
+                        <span>📄 {{ exam.numberOfQuestions }} {{ lang.t('dashboard.questions') }}</span>
+                        <span>📅 {{ exam.dateCreation | date }}</span>
+
+                        <span class="exam-visibility-badge"
+                              [class.public]="exam.visibility === 'PUBLIC'"
+                              [class.private]="exam.visibility === 'PRIVATE'"
+                              (click)="toggleVisibility(exam)">
+    {{ exam.visibility === 'PUBLIC' ? '🌍 Public' : '🔒 Privé' }}
+                            <span class="edit-icon">✎</span>
+</span>                        <!-- Badge des tests -->
+                        <span class="tests-badge" (click)="openTestsModal(exam)" *ngIf="canViewTests(exam)">
+    📊 {{ getTestsCount(exam) }}
+  </span>
+                    </div>
+                    <div class="exam-actions">
+                        <button class="btn-outline small" [routerLink]="['/exams', exam.codeExam]">{{ lang.t('dashboard.see') }}</button>
+                        <button class="btn-outline small" [routerLink]="['/exams', exam.codeExam, 'edit']">{{ lang.t('dashboard.edit') }}</button>
+                        <button class="btn-outline small" (click)="openShareModal(exam)" *ngIf="getAdminGroups().length > 0">
+                            🔗 {{ lang.t('dashboard.share') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examens publics -->
+        <div class="section">
+            <h2 class="section-title">{{ lang.t('dashboard.public_exams') }}</h2>
+            <div class="exams-grid">
+                <div class="exam-card" *ngFor="let exam of publicExams.slice(0, 6)">
+                    <div class="exam-card-header">
+                        <span class="exam-code">{{ exam.codeExam }}</span>
+                        <span class="status-badge">🌍 Public</span>
+                    </div>
+                    <div class="exam-desc">{{ exam.description }}</div>
+                    <div class="exam-meta">
+                        <span>📄 {{ exam.numberOfQuestions }} {{ lang.t('dashboard.questions') }}</span>
+                        <span>👤 Créateur ID: {{ exam.userId }}</span>
+                    </div>
+                    <div class="exam-actions">
+                        <button class="btn-outline small" [routerLink]="['/exams', exam.codeExam]">{{ lang.t('dashboard.see') }}</button>
+                        <button class="btn-outline small"
+                                (click)="confirmTakeExam(exam)">📝 {{ lang.t('dashboard.take_test') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examens partagés dans les groupes -->
+        <div class="section" *ngIf="sharedExams.length > 0">
+            <h2 class="section-title">{{ lang.t('dashboard.shared_exams') }}</h2>
+            <div class="exams-grid">
+                <div class="exam-card" *ngFor="let exam of sharedExams">
+                    <div class="exam-card-header">
+                        <span class="exam-code">{{ exam.codeExam }}</span>
+                        <span class="status-badge">👥 Partagé</span>
+                    </div>
+                    <div class="exam-desc">{{ exam.description }}</div>
+                    <div class="exam-meta">
+                        <span>📄 {{ exam.numberOfQuestions }} {{ lang.t('dashboard.questions') }}</span>
+                    </div>
+                    <div class="exam-actions">
+                        <button class="btn-outline small" [routerLink]="['/exams', exam.codeExam]">{{ lang.t('dashboard.see') }}</button>
+                        <button class="btn-outline small"
+                                (click)="confirmTakeExam(exam)">📝 {{ lang.t('dashboard.take_test') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Examens populaires -->
+        <div class="section">
+            <h2 class="section-title">{{ lang.t('dashboard.popular') }}</h2>
+            <div class="popular-list">
+                <div class="popular-item" *ngFor="let exam of popularExams.slice(0, 5); let i = index">
+                    <span class="popular-rank">#{{ i+1 }}</span>
+                    <span class="popular-name">{{ exam }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Modal Partager un examen -->
+    <div class="modal" *ngIf="showShareModal" (click)="$event.target === $event.currentTarget ? showShareModal = false : null">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ lang.t('dashboard.share_exam') }}: {{ selectedExam?.description }}</h3>
+                <button class="close" (click)="showShareModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ lang.t('dashboard.select_group') }}</label>
+                    <select [(ngModel)]="selectedGroupId" class="form-control">
+                        <option [value]="0">{{ lang.t('dashboard.choose_group') }}</option>
+                        <option *ngFor="let group of getAdminGroups()" [value]="group.id">
+                            {{ group.name }} ({{ group.membersCount }} membres)
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="showShareModal = false">{{ lang.t('dashboard.cancel') }}</button>
+                <button class="btn-primary" (click)="shareExamWithGroup()" [disabled]="selectedGroupId === 0">
+                    {{ lang.t('dashboard.share') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Rejoindre un groupe -->
+    <div class="modal" *ngIf="showJoinGroupModal" (click)="$event.target === $event.currentTarget ? closeJoinGroupModal() : null">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>{{ lang.t('dashboard.join_group') }}</h3>
+                <button class="close" (click)="closeJoinGroupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Barre de recherche en temps réel -->
+                <div class="search-bar">
+                    <input type="text"
+                           [(ngModel)]="groupSearchQuery"
+                           (input)="filterGroups()"
+                           class="form-control"
+                           [placeholder]="lang.t('dashboard.search_group_placeholder')"
+                           autofocus>
+                </div>
+
+                <!-- Indicateur de chargement -->
+
+
+                <!-- Aucun résultat -->
+                <div *ngIf="isSearching && filteredGroups.length === 0" class="empty-state">
+                    {{ lang.t('dashboard.no_groups_found') }}
+                </div>
+
+                <!-- Liste des résultats -->
+                <div class="groups-list" *ngIf="filteredGroups.length > 0">
+                    <div class="group-card-modal" *ngFor="let group of filteredGroups">
+                        <div class="group-info">
+                            <div class="group-name">
+                                <strong>{{ group.name }}</strong>
+                                <span class="group-visibility" [class.public]="group.visibility === 'PUBLIC'" [class.private]="group.visibility === 'PRIVATE'">
+                                {{ group.visibility === 'PUBLIC' ? '🌍 Public' : '🔒 Privé' }}
+                            </span>
+                            </div>
+                            <p class="group-desc">{{ group.description || lang.t('groups.no_description') }}</p>
+                            <div class="group-meta">
+                                <small>👑 {{ group.creatorName }}</small>
+                                <small>👥 {{ group.membersCount }} membres</small>
+                            </div>
+                        </div>
+                        <button class="btn-join"
+                                [class.btn-primary]="group.visibility === 'PUBLIC'"
+                                [class.btn-outline]="group.visibility === 'PRIVATE'"
+                                (click)="joinGroup(group)"
+                                [disabled]="isJoinRequestPending(group)">
+                            {{ getJoinButtonText(group) }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Liste des tests passés -->
+    <div class="modal" *ngIf="showTestsModal" (click)="$event.target === $event.currentTarget ? closeTestsModal() : null">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>{{ lang.t('exams.tests_list') }} - {{ selectedExamTitle }}</h3>
+                <button class="close" (click)="closeTestsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="selectedExamTests.length === 0" class="empty-state">
+                    {{ lang.t('exams.no_tests') }}
+                </div>
+                <div class="table-responsive" *ngIf="selectedExamTests.length > 0">
+                    <table class="tests-table">
+                        <thead>
+                        <tr>
+                            <th>{{ lang.t('exams.candidate') }}</th>
+                            <th>{{ lang.t('exams.score') }}</th>
+                            <th>{{ lang.t('exams.percentage') }}</th>
+                            <th>{{ lang.t('exams.date') }}</th>
+                            <th>{{ lang.t('exams.actions') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let test of selectedExamTests">
+                            <td>{{ test.userNameTest }}</td>
+                            <td>{{ test.score }} / {{ test.totalQuestions }}</td>
+                            <td>
+                                    <span class="score-badge"
+                                          [class.high]="(test.scorePercentage ?? 0) >= 80"
+                                          [class.medium]="(test.scorePercentage ?? 0) >= 50 && (test.scorePercentage ?? 0) < 80"
+                                          [class.low]="(test.scorePercentage ?? 0) < 50">
+                                        {{ test.scorePercentage ?? 0 }}%
+                                    </span>
+                            </td>
+                            <td>{{ test.datePassed | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <button class="btn-icon-small" (click)="viewTestDetails(test)" [title]="lang.t('exams.view_details')">
+                                📋
+                            </button>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeTestsModal()">{{ lang.t('exams.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Détails du test -->
+<div class="modal" *ngIf="showTestDetailsModal" (click)="$event.target === $event.currentTarget ? closeTestDetailsModal() : null">
+    <div class="modal-content modal-md">
+        <div class="modal-header">
+            <h3>{{ lang.t('exams.test_details') }} - {{ selectedTest?.userNameTest }}</h3>
+            <button class="close" (click)="closeTestDetailsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="details-container">
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.candidate') }} :</span>
+                    <span class="detail-value">{{ selectedTest?.userNameTest }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.score') }} :</span>
+                    <span class="detail-value">{{ selectedTest?.score }} / {{ selectedTest?.totalQuestions }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.percentage') }} :</span>
+                    <span class="detail-value">{{ selectedTest?.scorePercentage }}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.correct_answers') }} :</span>
+                    <span class="detail-value success">{{ selectedTest?.correctAnswers }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.wrong_answers') }} :</span>
+                    <span class="detail-value danger">{{ selectedTest?.wrongAnswers }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.date') }} :</span>
+                    <span class="detail-value">{{ selectedTest?.datePassed | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">{{ lang.t('exams.test_id') }} :</span>
+                    <span class="detail-value code">{{ selectedTest?.testId }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeTestDetailsModal()">{{ lang.t('exams.close') }}</button>
+        </div>
+    </div>
 </div>

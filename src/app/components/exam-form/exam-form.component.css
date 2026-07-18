@@ -1,102 +1,412 @@
-/* ── Bouton "Ajouter une question" en bas ── */
-.btn-add-question {
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border: 2px dashed #cbd5e1;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: 'Sora', sans-serif;
-  color: #2563eb;
-  cursor: pointer;
-  transition: all 0.15s;
+.form-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.question-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.question-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-.btn-add-question:hover {
-  background: #eff6ff;
-  border-color: #2563eb;
-  border-style: solid;
+  margin-bottom: 1rem;
 }
 
-/* ── Bouton "+ Ajouter une réponse" inline ── */
-.btn-add-inline {
-  margin-top: 0.5rem;
-  padding: 0.45rem 0.9rem;
-  background: transparent;
-  border: 1px dashed #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: 'Sora', sans-serif;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.btn-add-inline:hover {
-  border-color: #2563eb;
-  color: #2563eb;
-  background: #eff6ff;
-  border-style: solid;
+.question-number {
+  font-weight: 700;
+  color: var(--primary);
 }
 
-/* ── Actions de la question ── */
-.question-actions {
-  display: flex;
-  justify-content: flex-end;
+.answers-section {
   margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #f1f5f9;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
-/* ── Bouton Enregistrer / MAJ question ── */
-.btn-save-question {
-  padding: 0.55rem 1.2rem;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: 'Sora', sans-serif;
+.answers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.answer-item {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.answer-item app-math-editor {
+  flex: 1;
+  min-width: 200px;
+}
+
+.btn-add-answer {
+  margin-top: 0.25rem;
+}
+
+.status-select {
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  min-width: 120px;
+}
+
+.status-select.correct {
+  background: var(--success-light);
+  border-color: var(--success);
+}
+.status-select.wrong {
+  background: var(--danger-light);
+  border-color: var(--danger);
+}
+
+.btn-maj {
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
   cursor: pointer;
   transition: all 0.2s;
-  min-width: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
 }
-.btn-save-question:hover:not(:disabled) { background: #1d4ed8; }
-.btn-save-question:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-save-question.saving { background: #64748b; }
-.btn-save-question.saved  { background: #16a34a; }
-.btn-save-question.error  { background: #dc2626; }
+.btn-maj.saving { background: #fef3c7; border-color: #f59e0b; }
+.btn-maj.saved  { background: #d1fae5; border-color: #10b981; }
+.btn-maj.error  { background: #fee2e2; border-color: #ef4444; }
 
-/* ── Bouton MAJ réponse ── */
-.btn-maj {
-  padding: 0.4rem 0.65rem;
-  background: #f1f5f9;
-  color: #374151;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  font-family: 'Sora', sans-serif;
+.btn-add-inline {
+  background: none;
+  border: none;
+  color: var(--primary);
   cursor: pointer;
-  transition: all 0.15s;
-  min-width: 38px;
+  font-weight: 500;
+}
+.btn-add-inline:hover {
+  text-decoration: underline;
+}
+
+.btn-add-question {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.btn-add-question:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.question-actions {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.btn-save-question {
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save-question.saving { background: #fef3c7; border-color: #f59e0b; }
+.btn-save-question.saved  { background: #d1fae5; border-color: #10b981; }
+.btn-save-question.error  { background: #fee2e2; border-color: #ef4444; }
+
+.empty-questions {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.attachment-box {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.attachment-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.attachment-error {
+  font-size: 0.75rem;
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.attachment-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.attachment-icon {
+  font-size: 1.3rem;
   flex-shrink: 0;
 }
-.btn-maj:hover:not(:disabled) { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
-.btn-maj:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-maj.saving { background: #f1f5f9; color: #64748b; }
-.btn-maj.saved  { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
-.btn-maj.error  { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
+
+.attachment-name {
+  flex: 1;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-name:hover {
+  text-decoration: underline;
+}
+
+.attachment-audio-inline {
+  flex: 1;
+  height: 36px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.duration-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.duration-input-wrapper input {
+  max-width: 120px;
+}
+
+.duration-unit {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.question-nav-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.nav-arrow {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.nav-arrow:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.nav-arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.question-nav-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.nav-chip {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.nav-chip:hover {
+  border-color: var(--primary);
+}
+
+.nav-chip.filled {
+  background: var(--success-light);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.nav-chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+
+/* ── Ajouts pour la génération de questions par IA ── */
+
+.section-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-ai {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid #a78bfa;
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #6d28d9;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-ai:hover {
+  background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+  transform: translateY(-1px);
+}
+
+/* ── Modal générique (génération IA) ── */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content.modal-md {
+  max-width: 520px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.modal-header .close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0.25rem 0.5rem;
+}
+
+.modal-header .close:hover {
+  color: #0f172a;
+}
+
+.modal-header .close:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ── Bouton "Fermer" du modal (manquant dans ce composant) ── */
+.btn-secondary {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: #f1f5f9;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+

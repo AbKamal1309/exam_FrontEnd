@@ -1,22 +1,37 @@
 <div class="auth-wrapper">
-  <div class="auth-card">
-    <div class="auth-brand"><span class="brand-icon">⬡</span><h1>ExamPlatform</h1></div>
-    <h2 class="auth-title">{{ lang.t('login.title') }}</h2>
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
-      <div class="form-group">
-        <label>{{ lang.t('login.email') }}</label>
-        <input type="email" name="email" [(ngModel)]="email" required [placeholder]="lang.t('login.email')" class="form-control" />
-      </div>
-      <div class="form-group">
-        <label>{{ lang.t('login.password') }}</label>
-        <input type="password" name="password" [(ngModel)]="password" required placeholder="••••••••" class="form-control" />
-      </div>
-      <button type="submit" class="btn-primary" [disabled]="loading">
-        <span *ngIf="loading" class="spinner"></span>
-        {{ loading ? lang.t('login.loading') : lang.t('login.btn') }}
-      </button>
-    </form>
-    <p class="auth-link">{{ lang.t('login.no_account') }} <a routerLink="/register">{{ lang.t('login.register') }}</a></p>
-  </div>
+    <div class="auth-card">
+        <div class="auth-brand">
+            <span class="brand-icon">⬡</span>
+            <h1>ExamPlatform</h1>
+        </div>
+        <h2 class="auth-title">{{ lang.t('login.title') }}</h2>
+
+        <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label>{{ lang.t('login.email') }}</label>
+                <input type="email" [(ngModel)]="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>{{ lang.t('login.password') }}</label>
+                <input type="password" [(ngModel)]="password" name="password" class="form-control" required>
+            </div>
+            <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+            <button type="submit" class="btn-primary" style="width: 100%;" [disabled]="loading">
+                <span *ngIf="loading" class="spinner"></span>
+                <span *ngIf="!loading">{{ lang.t('login.btn') }}</span>
+                <span *ngIf="loading">{{ lang.t('login.loading') }}</span>
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>ou</span>
+        </div>
+
+        <div id="googleBtn" class="google-btn-container"></div>
+
+        <div class="auth-link">
+            {{ lang.t('login.no_account') }}
+            <a routerLink="/register">{{ lang.t('login.register') }}</a>
+        </div>
+    </div>
 </div>

@@ -707,3 +707,202 @@ a:hover { text-decoration: underline; }
 [dir="rtl"] .answer-option  { flex-direction: row-reverse; }
 [dir="rtl"] .test-question  { direction: rtl; text-align: right; }
 [dir="rtl"] .question-header-test { flex-direction: row-reverse; }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+
+/* ===== MATH RENDERING - FRACTIONS & SYMBOLS ===== */
+
+/* ── Fractions ── */
+.math-fraction {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  margin: 0 0.15rem !important;
+}
+
+.fraction-num {
+  border-bottom: 2px solid #1f2937 !important;
+  padding: 0 0.3rem 0.05rem 0.3rem !important;
+  font-size: 0.95rem !important;
+  text-align: center !important;
+  min-width: 10px !important;
+}
+
+.fraction-den {
+  padding: 0.05rem 0.3rem 0 0.3rem !important;
+  font-size: 0.95rem !important;
+  text-align: center !important;
+  min-width: 10px !important;
+}
+
+.fraction-line {
+  display: none !important;
+}
+
+/* ── Intégrales ── */
+.math-integral {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  gap: 0.05rem !important;
+  font-family: 'Times New Roman', serif !important;
+}
+
+.math-op-symbol {
+  font-size: 1.3rem !important;
+  font-weight: 500 !important;
+}
+
+.math-bounds {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  font-size: 0.65rem !important;
+  line-height: 1.1 !important;
+  margin: 0 0.05rem !important;
+}
+
+.math-bound-upper {
+  color: var(--text, #1f2937) !important;
+}
+
+.math-bound-lower {
+  color: var(--text, #1f2937) !important;
+}
+
+/* ── Sommes et produits ── */
+.math-sigma {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  font-family: 'Times New Roman', serif !important;
+}
+
+.math-sigma .math-op-symbol {
+  font-size: 1.3rem !important;
+  font-weight: 500 !important;
+}
+
+.math-sigma .math-bound-upper {
+  font-size: 0.6rem !important;
+  line-height: 1 !important;
+}
+
+.math-sigma .math-bound-lower {
+  font-size: 0.6rem !important;
+  line-height: 1 !important;
+}
+
+/* ── Limites ── */
+.math-lim {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  font-family: 'Times New Roman', serif !important;
+}
+
+.math-lim-op {
+  font-size: 0.95rem !important;
+  font-style: italic !important;
+}
+
+.math-lim-cond {
+  font-size: 0.7rem !important;
+  color: var(--text-muted, #6b7280) !important;
+}
+
+/* ── Racines ── */
+.math-sqrt {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  font-family: 'Times New Roman', serif !important;
+  font-size: 1.1rem !important;
+}
+
+.math-sqrt .sqrt-index {
+  font-size: 0.6rem !important;
+  vertical-align: super !important;
+  margin-right: -2px !important;
+}
+
+.math-sqrt .sqrt-content {
+  font-size: 1rem !important;
+}
+
+/* ── Blocs d'affichage ── */
+.math-display {
+  text-align: center !important;
+  font-size: 1.2rem !important;
+  padding: 0.5rem !important;
+  background: var(--bg, #f8fafc) !important;
+  border-radius: 8px !important;
+  margin: 0.25rem 0 !important;
+}
+
+.math-inline {
+  font-size: 1rem !important;
+  padding: 0.1rem 0.2rem !important;
+}
+
+/* ── Exposants et indices ── */
+.preview-content sub,
+.math-display sub,
+.math-inline sub {
+  font-size: 0.7rem !important;
+  vertical-align: sub !important;
+}
+
+.preview-content sup,
+.math-display sup,
+.math-inline sup {
+  font-size: 0.7rem !important;
+  vertical-align: super !important;
+}
+
+/* ── Texte dans preview ── */
+.preview-content .math-text {
+  font-style: italic !important;
+  color: var(--text-muted, #6b7280) !important;
+}
+
+/* Correction pour la preview */
+.preview-content {
+  font-family: 'Times New Roman', Times, serif !important;
+  font-size: 1.1rem !important;
+  padding: 0.5rem 0.75rem !important;
+  background: var(--surface, #ffffff) !important;
+  border-radius: 6px !important;
+  min-height: 30px !important;
+  border: 1px dashed var(--border, #d1d5db) !important;
+  line-height: 1.8 !important;
+}
+
+.preview-content .math-fraction {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  margin: 0 0.2rem !important;
+}
+
+.preview-content .fraction-num {
+  border-bottom: 2px solid #1f2937 !important;
+  padding: 0 0.3rem 0.05rem 0.3rem !important;
+  font-size: 0.9rem !important;
+  text-align: center !important;
+}
+
+.preview-content .fraction-den {
+  padding: 0.05rem 0.3rem 0 0.3rem !important;
+  font-size: 0.9rem !important;
+  text-align: center !important;
+}
+

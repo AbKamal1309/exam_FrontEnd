@@ -1,69 +1,72 @@
-<app-navbar></app-navbar>
+<div>
+    <app-navbar></app-navbar>
+    <div class="page-container result-container">
+        <div *ngIf="loading" class="loading-state">{{ lang.t('test_result.loading') }}</div>
 
-<div class="page-container">
-  <div *ngIf="loading" class="loading-state">Chargement des résultats...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+        <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+            <br><br>
+            <button class="btn-primary" (click)="backToDashboard()">
+                {{ lang.t('test_result.back_to_dashboard') }}
+            </button>
+        </div>
 
-  <div *ngIf="!loading && result" class="result-container">
-    <!-- Score Principal -->
-    <div class="score-hero" [ngClass]="scoreClass">
-      <div class="score-circle">
-        <span class="score-number">{{ result.score }}</span>
-        <span class="score-total">/{{ result.numberOfQuestions }}</span>
-      </div>
-      <div class="score-percent">{{ scorePercent }}%</div>
-      <div class="score-message">
-        <span *ngIf="scorePercent >= 80">🏆 Excellent !</span>
-        <span *ngIf="scorePercent >= 60 && scorePercent < 80">👍 Bien joué !</span>
-        <span *ngIf="scorePercent >= 40 && scorePercent < 60">📚 Peut mieux faire</span>
-        <span *ngIf="scorePercent < 40">💪 Continuez les efforts</span>
-      </div>
+        <div *ngIf="!loading && !error && result">
+            <!-- En-tête de score -->
+            <div class="score-hero" [ngClass]="getScoreClass()">
+                <div class="score-circle">
+                    <span class="score-number">{{ result.score || 0 }}</span>
+                    <span class="score-total">/{{ result.totalQuestions || 0 }}</span>
+                </div>
+                <div class="score-percent">{{ getScorePercent() }}%</div>
+                <div class="score-message">
+                    {{ getScorePercent() >= 60 ? lang.t('test_result.congrats') : lang.t('test_result.keep_trying') }}
+                </div>
+            </div>
+
+            <!-- Détails du test -->
+            <div class="result-details">
+                <h2>{{ lang.t('test_result.summary') }}</h2>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">{{ lang.t('test_result.candidate_name') }}</span>
+                        <span class="detail-value">{{ result.userNameTest }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">{{ lang.t('test_result.exam_creator') }}</span>
+                        <span class="detail-value">{{ result.userNameExamSetter }}</span>
+                    </div>
+                    <div class="detail-item success">
+                        <span class="detail-label">{{ lang.t('test_result.correct_answers') }}</span>
+                        <span class="detail-value">{{ result.correctAnswers || 0 }}</span>
+                    </div>
+                    <div class="detail-item danger">
+                        <span class="detail-label">{{ lang.t('test_result.wrong_answers') }}</span>
+                        <span class="detail-value">{{ result.wrongAnswers || 0 }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">{{ lang.t('test_result.score') }}</span>
+                        <span class="detail-value">{{ result.score }} / {{ result.totalQuestions }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">{{ lang.t('test_result.date') }}</span>
+                        <span class="detail-value">{{ result.datePassed | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="result-actions">
+                <button class="btn-secondary" (click)="backToDashboard()">
+                    ← {{ lang.t('test_result.back_to_dashboard') }}
+                </button>
+                <button class="btn-primary" (click)="retakeTest()">
+                    🔃 {{ lang.t('test_result.retake_test') }}
+                </button>
+                <button class="btn-primary" (click)="goToCorrection()">
+                    📖 {{ lang.t('test_result.view_correction') }}
+                </button>
+            </div>
+        </div>
     </div>
-
-    <!-- Détails -->
-    <div class="result-details">
-      <h2>Détails du résultat</h2>
-      <div class="detail-grid">
-        <div class="detail-item">
-          <span class="detail-label">Candidat</span>
-          <span class="detail-value">{{ result.userName }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Examen</span>
-          <span class="detail-value">{{ result.examSetName }}</span>
-        </div>
-        <div class="detail-item success">
-          <span class="detail-label">✓ Réussies</span>
-          <span class="detail-value">{{ result.numberOfSucceededQuestions }}</span>
-        </div>
-        <div class="detail-item danger">
-          <span class="detail-label">✗ Échouées</span>
-          <span class="detail-value">{{ result.numberOfFailedQuestions }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Questions échouées -->
-    <div class="failed-section" *ngIf="result.failedQuestions?.length">
-      <h2>Questions à revoir</h2>
-      <div class="failed-question" *ngFor="let q of result.failedQuestions; let i = index">
-        <div class="failed-q-header">
-          <span class="failed-icon">✗</span>
-          <span>{{ q.questionContent }}</span>
-        </div>
-        <div class="correct-answers">
-          <p class="correct-label">Bonne(s) réponse(s) :</p>
-          <span class="answer-chip correct" *ngFor="let a of q.answers">
-            <span *ngIf="a.answerStatus === 'CORRECT'">{{ a.answerContent }}</span>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="result-actions">
-      <a routerLink="/exams" class="btn-primary">Voir tous les examens</a>
-      <a routerLink="/dashboard" class="btn-outline">Tableau de bord</a>
-    </div>
-  </div>
 </div>

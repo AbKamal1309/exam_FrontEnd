@@ -1,20 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { ApiService } from '../../services/api.service';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { ApiService, GenerateQuestionsRequest } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { LangService } from '../../services/lang.service';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { ExamDTO, QuestionDTO, AnswerDTO } from '../../models/models';
+import { MathEditorComponent } from '../math-editor/math-editor.component';
+import { ExamDTO, QuestionDTO, AttachmentType } from '../../models/models';
 
-// État de sauvegarde par index
-interface SaveState { saving: boolean; saved: boolean; error: boolean; }
+interface SaveState {
+  saving: boolean;
+  saved: boolean;
+  error: boolean;
+}
 
 @Component({
   selector: 'app-exam-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NavbarComponent,
+    MathEditorComponent
+  ],
   templateUrl: './exam-form.component.html',
   styleUrls: ['./exam-form.component.css']
 })
@@ -24,23 +34,45 @@ export class ExamFormComponent implements OnInit {
   saving = false;
   error = '';
   success = '';
+  hasDuration = false;
+  currentQuestionIndex = 0;
 
   exam: ExamDTO = {
     description: '',
     status: 'CREATED',
+    visibility: 'PRIVATE',
     numberOfQuestions: 0,
     questionDTOList: []
   };
 
-  // États individuels pour chaque question et réponse
-  questionStates: { [qi: number]: SaveState } = {};
-  answerStates: { [key: string]: SaveState } = {};
+  // État de l'upload de pièce jointe uniquement (par question)
+  attachmentStates: { [qi: number]: SaveState } = {};
+
+  readonly acceptedAttachmentTypes = '.pdf,.doc,.docx,image/*,video/*,audio/*';
+  readonly maxAttachmentSizeMb = 50;
+
+  // ==================== GÉNÉRATION IA ====================
+  showAiModal = false;
+  aiGenerating = false;
+  aiError = '';
+  aiRequest: GenerateQuestionsRequest = {
+    subject: '',
+    level: '',
+    numberOfQuestions: 5,
+    language: 'fr',
+    allowMultipleCorrectAnswers: true,
+    difficulty: 'MOYEN'
+  };
+  aiFile: File | null = null;
+  readonly acceptedAiFileTypes = '.pdf,.docx,.txt';
+  readonly maxAiFileSizeMb = 10;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private api: ApiService,
-    public auth: AuthService
+      private route: ActivatedRoute,
+      private router: Router,
+      private api: ApiService,
+      public auth: AuthService,
+      public lang: LangService
   ) {}
 
   ngOnInit() {
@@ -49,9 +81,25 @@ export class ExamFormComponent implements OnInit {
       this.isEdit = true;
       this.loading = true;
       this.api.getExam(codeExam).subscribe({
-        next: exam => { this.exam = exam; this.loading = false; },
-        error: () => { this.error = 'Examen introuvable'; this.loading = false; }
+        next: exam => {
+          this.exam = exam;
+          this.currentQuestionIndex = 0;
+          this.hasDuration = exam.durationMinutes != null && exam.durationMinutes > 0;
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Examen introuvable';
+          this.loading = false;
+        }
       });
+    }
+  }
+
+  onToggleDuration() {
+    if (!this.hasDuration) {
+      this.exam.durationMinutes = undefined;
+    } else if (!this.exam.durationMinutes) {
+      this.exam.durationMinutes = 60; // valeur par défaut : 60 minutes
     }
   }
 
@@ -63,48 +111,91 @@ export class ExamFormComponent implements OnInit {
       questionContent: '',
       description: '',
       answers: [
-        { answerContent: '', answerStatus: 'CORRECT', description: '' },
-        { answerContent: '', answerStatus: 'WRONG', description: '' }
+        { answerContent: '', answerStatus: 'CORRECT', description: '' }
       ]
     });
+    this.currentQuestionIndex = this.exam.questionDTOList.length - 1;
   }
 
   removeQuestion(index: number) {
     this.exam.questionDTOList?.splice(index, 1);
+    const len = this.exam.questionDTOList?.length ?? 0;
+    if (this.currentQuestionIndex >= len) {
+      this.currentQuestionIndex = Math.max(0, len - 1);
+    }
   }
 
-  /** Enregistre une nouvelle question (POST) */
-  saveQuestion(question: QuestionDTO, qi: number) {
-    this.questionStates[qi] = { saving: true, saved: false, error: false };
-    const payload: QuestionDTO = {
-      ...question,
-      examId: this.exam.codeExam
-    };
-    this.api.saveQuestionAndAnswers(payload).subscribe({
-      next: saved => {
-        question.codeQuestion = saved.codeQuestion; // Récupère le code généré
-        this.questionStates[qi] = { saving: false, saved: true, error: false };
-        setTimeout(() => { if (this.questionStates[qi]) this.questionStates[qi].saved = false; }, 2500);
-      },
-      error: () => {
-        this.questionStates[qi] = { saving: false, saved: false, error: true };
-      }
-    });
+  // ── PIÈCE JOINTE (document / vidéo / audio support de la question) ─────
+
+  getAttachmentState(qi: number): SaveState {
+    return this.attachmentStates[qi] ?? { saving: false, saved: false, error: false };
   }
 
-  /** Met à jour une question existante (PUT) */
-  updateQuestion(question: QuestionDTO, qi: number) {
-    if (!question.codeQuestion) { this.saveQuestion(question, qi); return; }
-    this.questionStates[qi] = { saving: true, saved: false, error: false };
-    this.api.updateQuestionWithAnswers(question.codeQuestion, question).subscribe({
-      next: () => {
-        this.questionStates[qi] = { saving: false, saved: true, error: false };
-        setTimeout(() => { if (this.questionStates[qi]) this.questionStates[qi].saved = false; }, 2500);
+  onFileSelected(event: Event, question: QuestionDTO, qi: number) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > this.maxAttachmentSizeMb * 1024 * 1024) {
+      this.attachmentStates[qi] = { saving: false, saved: false, error: true };
+      input.value = '';
+      return;
+    }
+
+    this.attachmentStates[qi] = { saving: true, saved: false, error: false };
+
+    this.api.uploadQuestionAttachment(file).subscribe({
+      next: res => {
+        question.attachmentUrl = res.url;
+        question.attachmentType = res.type;
+        question.attachmentName = res.name;
+        this.attachmentStates[qi] = { saving: false, saved: true, error: false };
+        setTimeout(() => {
+          if (this.attachmentStates[qi]) this.attachmentStates[qi].saved = false;
+        }, 2500);
       },
       error: () => {
-        this.questionStates[qi] = { saving: false, saved: false, error: true };
+        this.attachmentStates[qi] = { saving: false, saved: false, error: true };
       }
     });
+
+    input.value = '';
+  }
+
+  removeAttachment(question: QuestionDTO) {
+    question.attachmentUrl = undefined;
+    question.attachmentType = undefined;
+    question.attachmentName = undefined;
+  }
+
+  getAttachmentIcon(type?: AttachmentType): string {
+    switch (type) {
+      case 'PDF':   return '📄';
+      case 'WORD':  return '📝';
+      case 'IMAGE': return '🖼️';
+      case 'VIDEO': return '🎬';
+      case 'AUDIO': return '🎵';
+      default:      return '📎';
+    }
+  }
+
+  goToQuestion(index: number) {
+    if (this.exam.questionDTOList && index >= 0 && index < this.exam.questionDTOList.length) {
+      this.currentQuestionIndex = index;
+    }
+  }
+
+  nextQuestion() {
+    const len = this.exam.questionDTOList?.length ?? 0;
+    if (this.currentQuestionIndex < len - 1) this.currentQuestionIndex++;
+  }
+
+  prevQuestion() {
+    if (this.currentQuestionIndex > 0) this.currentQuestionIndex--;
+  }
+
+  isQuestionFilled(question: QuestionDTO): boolean {
+    return !!question.questionContent?.trim();
   }
 
   // ── RÉPONSES ───────────────────────────────────────────
@@ -118,66 +209,104 @@ export class ExamFormComponent implements OnInit {
     question.answers?.splice(index, 1);
   }
 
-  answerKey(qi: number, ai: number): string { return `${qi}_${ai}`; }
+  // ==================== GÉNÉRATION IA ====================
 
-  getQuestionState(qi: number): SaveState {
-    return this.questionStates[qi] ?? { saving: false, saved: false, error: false };
+  openAiModal() {
+    this.aiError = '';
+    this.showAiModal = true;
   }
 
-  getAnswerState(qi: number, ai: number): SaveState {
-    return this.answerStates[this.answerKey(qi, ai)] ?? { saving: false, saved: false, error: false };
+  closeAiModal() {
+    if (this.aiGenerating) return; // évite de fermer pendant un appel en cours
+    this.showAiModal = false;
   }
 
-  /** Enregistre une nouvelle réponse (POST) */
-  saveAnswer(answer: AnswerDTO, question: QuestionDTO, qi: number, ai: number) {
-    const key = this.answerKey(qi, ai);
-    this.answerStates[key] = { saving: true, saved: false, error: false };
-    const payload: AnswerDTO = { ...answer, questionId: question.codeQuestion };
-    this.api.saveAnswer(payload).subscribe({
-      next: saved => {
-        answer.codeAnswer = saved.codeAnswer;
-        this.answerStates[key] = { saving: false, saved: true, error: false };
-        setTimeout(() => { if (this.answerStates[key]) this.answerStates[key].saved = false; }, 2500);
+  onAiFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > this.maxAiFileSizeMb * 1024 * 1024) {
+      this.aiError = this.lang.t('form.ai_file_too_large');
+      input.value = '';
+      return;
+    }
+
+    this.aiError = '';
+    this.aiFile = file;
+    input.value = '';
+  }
+
+  removeAiFile() {
+    this.aiFile = null;
+  }
+
+  generateWithAi() {
+    if (!this.aiRequest.subject || !this.aiRequest.subject.trim()) {
+      this.aiError = this.lang.t('form.ai_subject_required');
+      return;
+    }
+
+    this.aiGenerating = true;
+    this.aiError = '';
+
+    this.api.generateQuestionsWithAi(this.aiRequest, this.aiFile).subscribe({
+      next: (questions) => {
+        if (!this.exam.questionDTOList) this.exam.questionDTOList = [];
+        const insertIndex = this.exam.questionDTOList.length;
+        // Les questions générées n'ont pas de codeQuestion : elles seront créées
+        // au moment du "Enregistrer" global, comme les questions ajoutées manuellement.
+        this.exam.questionDTOList.push(...questions);
+        this.currentQuestionIndex = insertIndex; // saute sur la 1ère question générée pour relecture
+        this.aiGenerating = false;
+        this.showAiModal = false;
+        this.aiFile = null;
       },
-      error: () => { this.answerStates[key] = { saving: false, saved: false, error: true }; }
+      error: (err) => {
+        this.aiGenerating = false;
+        this.aiError = err.error?.message || this.lang.t('form.ai_error');
+      }
     });
   }
 
-  /** Met à jour une réponse existante (PUT) */
-  updateAnswer(answer: AnswerDTO, qi: number, ai: number) {
-    if (!answer.codeAnswer) return;
-    const key = this.answerKey(qi, ai);
-    this.answerStates[key] = { saving: true, saved: false, error: false };
-    this.api.updateAnswer(answer.codeAnswer, answer).subscribe({
-      next: () => {
-        this.answerStates[key] = { saving: false, saved: true, error: false };
-        setTimeout(() => { if (this.answerStates[key]) this.answerStates[key].saved = false; }, 2500);
-      },
-      error: () => { this.answerStates[key] = { saving: false, saved: false, error: true }; }
-    });
-  }
-
-  // ── EXAMEN (infos générales) ───────────────────────────
+  // ── ACTIONS GLOBALES ───────────────────────────────────
 
   onSubmit() {
     this.saving = true;
     this.error = '';
-    const userId = (this.auth.currentUser as any)?.id;
+    const userId = this.auth.getCurrentUserId();
 
     if (this.isEdit) {
       this.api.updateExam(this.exam.codeExam!, this.exam).subscribe({
-        next: () => { this.success = 'Examen mis à jour !'; this.saving = false; },
-        error: () => { this.error = 'Erreur lors de la mise à jour.'; this.saving = false; }
+        next: () => {
+          this.success = 'Examen mis à jour !';
+          this.saving = false;
+        },
+        error: () => {
+          this.error = 'Erreur lors de la mise à jour.';
+          this.saving = false;
+        }
       });
     } else {
-      this.api.saveExamAllQuestionsAndAnswers(userId, this.exam).subscribe({
+      this.exam.userId = userId;
+      this.exam.numberOfQuestions = this.exam.questionDTOList?.length || 0;
+      this.exam.dateCreation = new Date().toISOString();
+
+      this.api.saveExam(this.exam).subscribe({
         next: saved => {
           this.success = 'Examen créé avec succès !';
           this.saving = false;
           setTimeout(() => this.router.navigate(['/exams', saved.codeExam]), 1000);
         },
-        error: () => { this.error = 'Erreur lors de la création.'; this.saving = false; }
+        error: () => {
+          this.error = 'Erreur lors de la création.';
+          this.saving = false;
+        }
       });
     }
+  }
+
+  cancel() {
+    this.router.navigate(['/exams']);
   }
 }

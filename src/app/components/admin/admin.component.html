@@ -1,0 +1,157 @@
+<app-navbar></app-navbar>
+
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">🛡️ {{ lang.t('admin.title') }}</h1>
+            <p class="page-subtitle">{{ lang.t('admin.subtitle') }}</p>
+        </div>
+    </div>
+
+    <div class="admin-tabs">
+        <button class="admin-tab" [class.active]="activeTab === 'stats'" (click)="setTab('stats')">
+            📊 {{ lang.t('admin.tab_stats') }}
+        </button>
+        <button class="admin-tab" [class.active]="activeTab === 'users'" (click)="setTab('users')">
+            👥 {{ lang.t('admin.tab_users') }}
+        </button>
+        <button class="admin-tab" [class.active]="activeTab === 'exams'" (click)="setTab('exams')">
+            📝 {{ lang.t('admin.tab_exams') }}
+        </button>
+        <button class="admin-tab" [class.active]="activeTab === 'groups'" (click)="setTab('groups')">
+            👨‍👩‍👧‍👦 {{ lang.t('admin.tab_groups') }}
+        </button>
+    </div>
+
+    <!-- ── STATS ── -->
+    <div *ngIf="activeTab === 'stats'">
+        <div *ngIf="loadingStats" class="loading-state">{{ lang.t('admin.loading') }}</div>
+        <div class="stats-grid" *ngIf="!loadingStats && stats">
+            <div class="stat-card">
+                <span class="stat-icon">👥</span>
+                <span class="stat-value">{{ stats.totalUsers }}</span>
+                <span class="stat-label">{{ lang.t('admin.stat_users') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📝</span>
+                <span class="stat-value">{{ stats.totalExams }}</span>
+                <span class="stat-label">{{ lang.t('admin.stat_exams') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🧩</span>
+                <span class="stat-value">{{ stats.totalQuestions }}</span>
+                <span class="stat-label">{{ lang.t('admin.stat_questions') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">👨‍👩‍👧‍👦</span>
+                <span class="stat-value">{{ stats.totalGroups }}</span>
+                <span class="stat-label">{{ lang.t('admin.stat_groups') }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">✅</span>
+                <span class="stat-value">{{ stats.totalTestsPassed }}</span>
+                <span class="stat-label">{{ lang.t('admin.stat_tests') }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── UTILISATEURS ── -->
+    <div *ngIf="activeTab === 'users'">
+        <input type="text" [(ngModel)]="userSearch" [placeholder]="lang.t('admin.search_user')" class="search-input" />
+
+        <div *ngIf="loadingUsers" class="loading-state">{{ lang.t('admin.loading') }}</div>
+
+        <div class="table-container" *ngIf="!loadingUsers">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>{{ lang.t('admin.col_name') }}</th>
+                    <th>{{ lang.t('admin.col_email') }}</th>
+                    <th></th>
+                    <th>{{ lang.t('admin.col_actions') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let user of filteredUsers">
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="admin-badge" *ngIf="isUserAdmin(user)">🛡️ Admin</span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn-outline small" (click)="promoteUser(user)">
+                            ⬆️ {{ lang.t('admin.promote') }}
+                        </button>
+                        <button class="btn-outline small" (click)="demoteUser(user)">
+                            ⬇️ {{ lang.t('admin.demote') }}
+                        </button>
+                        <button class="btn-icon danger" [title]="lang.t('admin.delete_user')" (click)="deleteUser(user)">🗑️</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── EXAMENS (modération) ── -->
+    <div *ngIf="activeTab === 'exams'">
+        <input type="text" [(ngModel)]="examSearch" [placeholder]="lang.t('admin.search_exam')" class="search-input" />
+
+        <div *ngIf="loadingExams" class="loading-state">{{ lang.t('admin.loading') }}</div>
+
+        <div class="table-container" *ngIf="!loadingExams">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>{{ lang.t('admin.col_code') }}</th>
+                    <th>{{ lang.t('admin.col_description') }}</th>
+                    <th>{{ lang.t('admin.col_visibility') }}</th>
+                    <th>{{ lang.t('admin.col_actions') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let exam of filteredExams">
+                    <td><code class="code-badge">{{ exam.codeExam }}</code></td>
+                    <td>{{ exam.description || '—' }}</td>
+                    <td>{{ exam.visibility }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon danger" [title]="lang.t('admin.delete_exam')" (click)="deleteExamAsAdmin(exam)">🗑️</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── GROUPES (modération) ── -->
+    <div *ngIf="activeTab === 'groups'">
+        <input type="text" [(ngModel)]="groupSearch" [placeholder]="lang.t('admin.search_group')" class="search-input" />
+
+        <div *ngIf="loadingGroups" class="loading-state">{{ lang.t('admin.loading') }}</div>
+
+        <div class="table-container" *ngIf="!loadingGroups">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>{{ lang.t('admin.col_group_name') }}</th>
+                    <th>{{ lang.t('admin.col_creator') }}</th>
+                    <th>{{ lang.t('admin.col_members') }}</th>
+                    <th>{{ lang.t('admin.col_visibility') }}</th>
+                    <th>{{ lang.t('admin.col_actions') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let group of filteredGroups">
+                    <td>{{ group.name }}</td>
+                    <td>{{ group.creatorName }}</td>
+                    <td>{{ group.membersCount }}</td>
+                    <td>{{ group.visibility }}</td>
+                    <td class="actions-cell">
+                        <button class="btn-icon danger" [title]="lang.t('admin.delete_group')" (click)="deleteGroupAsAdmin(group)">🗑️</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

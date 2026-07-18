@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 import { LandingComponent } from './components/landing/landing.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -9,7 +10,10 @@ import { ExamFormComponent } from './components/exam-form/exam-form.component';
 import { ExamDetailComponent } from './components/exam-detail/exam-detail.component';
 import { TestComponent } from './components/test/test.component';
 import { TestResultComponent } from './components/test-result/test-result.component';
+import { TestCorrectionComponent } from './components/test-correction/test-correction.component'; //
 import { UsersComponent } from './components/users/users.component';
+import { GroupsComponent } from './components/groups/groups.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -22,6 +26,9 @@ export const routes: Routes = [
   { path: 'exams/:codeExam/edit', component: ExamFormComponent, canActivate: [authGuard] },
   { path: 'test', component: TestComponent, canActivate: [authGuard] },
   { path: 'test-result', component: TestResultComponent, canActivate: [authGuard] },
-  { path: 'users', component: UsersComponent, canActivate: [authGuard] },
+  { path: 'test-correction', component: TestCorrectionComponent, canActivate: [authGuard] },
+    { path: 'users', component: UsersComponent, canActivate: [authGuard] },
+  { path: 'groups', component: GroupsComponent, canActivate: [authGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
   { path: '**', redirectTo: '' }
 ];

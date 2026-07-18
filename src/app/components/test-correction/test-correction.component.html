@@ -1,0 +1,94 @@
+<div>
+    <app-navbar></app-navbar>
+    <div class="page-container correction-container">
+        <div *ngIf="loading" class="loading-state">{{ lang.t('correction.loading') }}</div>
+        <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+        <div *ngIf="!loading && !error && corrections.length > 0">
+            <h1 class="page-title">{{ lang.t('correction.detailed_title') }}</h1>
+
+            <div class="correction-list">
+                <div class="correction-card" *ngFor="let q of corrections; let i = index"
+                     [class.correct]="q.isFullyCorrect" [class.incorrect]="!q.isFullyCorrect">
+
+                    <div class="card-header">
+                        <span class="question-num">{{ lang.t('correction.question_label') }} {{ i + 1 }}</span>
+                        <span class="status-badge" [class.correct]="q.isFullyCorrect" [class.incorrect]="!q.isFullyCorrect">
+              {{ q.isFullyCorrect ? lang.t('correction.correct_badge') : lang.t('correction.incorrect_badge') }}
+            </span>
+                    </div>
+
+                    <div class="question-content" [innerHTML]="renderMath(q.content)"></div>
+
+                    <!-- ── Pièce jointe (document ou vidéo support) ── -->
+                    <div class="question-attachment" *ngIf="q.attachmentUrl">
+                        <img *ngIf="q.attachmentType === 'IMAGE'"
+                             [src]="api.getFileUrl(q.attachmentUrl)"
+                             [alt]="q.attachmentName"
+                             class="attachment-image" />
+
+                        <video *ngIf="q.attachmentType === 'VIDEO'"
+                               [src]="api.getFileUrl(q.attachmentUrl)"
+                               class="attachment-video"
+                               controls
+                               preload="metadata">
+                        </video>
+                        <audio *ngIf="q.attachmentType === 'AUDIO'"
+                               [src]="api.getFileUrl(q.attachmentUrl)"
+                               class="attachment-audio"
+                               controls
+                               preload="metadata">
+                        </audio>
+
+                        <a *ngIf="q.attachmentType === 'PDF' || q.attachmentType === 'WORD'"
+                           [href]="api.getFileUrl(q.attachmentUrl)"
+                           target="_blank" rel="noopener"
+                           class="attachment-file-link">
+                            <span class="attachment-icon">{{ getAttachmentIcon(q.attachmentType) }}</span>
+                            <span>{{ q.attachmentName }}</span>
+                        </a>
+                    </div>
+
+                    <div class="answers-correction">
+                        <div class="answer-row" *ngFor="let ans of q.answers"
+                             [class.user-correct]="ans.isUserCorrect && ans.isActuallyCorrect"
+                             [class.user-wrong]="ans.isUserCorrect && !ans.isActuallyCorrect"
+                             [class.missed-correct]="!ans.isUserCorrect && ans.isActuallyCorrect">
+                            <div class="answer-icon">
+                                <span *ngIf="ans.isUserCorrect && ans.isActuallyCorrect" class="icon icon-ok">✓</span>
+                                <span *ngIf="ans.isUserCorrect && !ans.isActuallyCorrect" class="icon icon-bad">✗</span>
+                                <span *ngIf="!ans.isUserCorrect && ans.isActuallyCorrect" class="icon icon-missed">!</span>
+                                <span *ngIf="!ans.isUserCorrect && !ans.isActuallyCorrect" class="icon icon-neutral">•</span>
+                            </div>
+                            <div class="answer-content" [innerHTML]="renderMath(ans.content)"></div>
+                            <div class="answer-status-text">
+                <span *ngIf="ans.isUserCorrect && ans.isActuallyCorrect">
+                  {{ lang.t('correction.your_answer_correct_text') }}
+                </span>
+                                <span *ngIf="ans.isUserCorrect && !ans.isActuallyCorrect">
+                  {{ lang.t('correction.your_answer_wrong_text') }}
+                </span>
+                                <span *ngIf="!ans.isUserCorrect && ans.isActuallyCorrect">
+                  {{ lang.t('correction.correct_not_selected_text') }}
+                </span>
+                                <span *ngIf="!ans.isUserCorrect && !ans.isActuallyCorrect">
+                  {{ lang.t('correction.not_selected_text') }}
+                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="correct-answer-hint" *ngIf="!q.isFullyCorrect">
+                        {{ lang.t('correction.hint_text') }} <strong [innerHTML]="renderMath(q.correctAnswerContent)"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" (click)="backToDashboard()">
+                    ← {{ lang.t('correction.back_to_dashboard') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

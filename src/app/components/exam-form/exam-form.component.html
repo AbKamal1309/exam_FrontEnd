@@ -1,151 +1,288 @@
 <app-navbar></app-navbar>
 
 <div class="page-container">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">{{ isEdit ? 'Modifier l\'examen' : 'Nouvel examen' }}</h1>
-      <p class="page-subtitle">{{ isEdit ? exam.codeExam : 'Créez votre examen avec questions et réponses' }}</p>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">{{ isEdit ? lang.t('form.edit_title') : lang.t('form.title') }}</h1>
+            <p class="page-subtitle">{{ isEdit ? exam.codeExam : lang.t('form.subtitle') }}</p>
+        </div>
+        <a routerLink="/exams" class="btn-outline">← {{ lang.t('form.back') }}</a>
     </div>
-    <a routerLink="/exams" class="btn-outline">← Retour</a>
-  </div>
 
-  <div *ngIf="loading" class="loading-state">Chargement...</div>
+    <div *ngIf="loading" class="loading-state">{{ lang.t('form.loading') }}</div>
 
-  <div *ngIf="!loading">
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+    <div *ngIf="!loading">
+        <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+        <div *ngIf="success" class="alert alert-success">{{ success }}</div>
 
-    <form (ngSubmit)="onSubmit()" #examForm="ngForm">
+        <form (ngSubmit)="onSubmit()" #examForm="ngForm">
 
-      <!-- ── Infos générales ── -->
-      <div class="form-section">
-        <h2 class="section-title">Informations générales</h2>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Description</label>
-            <input type="text" name="description" [(ngModel)]="exam.description"
-              placeholder="Description de l'examen" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label>Statut</label>
-            <select name="status" [(ngModel)]="exam.status" class="form-control">
-              <option value="CREATED">Créé</option>
-              <option value="ACTIVATED">Activé</option>
-              <option value="SUSPENDED">Suspendu</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── Questions ── -->
-      <div class="form-section">
-        <h2 class="section-title">Questions ({{ exam.questionDTOList?.length || 0 }})</h2>
-
-        <div class="empty-questions" *ngIf="!exam.questionDTOList?.length">
-          <p>Aucune question. Cliquez sur le bouton ci-dessous pour commencer.</p>
-        </div>
-
-        <div class="question-card" *ngFor="let question of exam.questionDTOList; let qi = index">
-
-          <div class="question-header">
-            <span class="question-number">Q{{ qi + 1 }}</span>
-            <button type="button" class="btn-icon danger" title="Supprimer" (click)="removeQuestion(qi)">✕</button>
-          </div>
-
-          <div class="form-group">
-            <label>Contenu de la question</label>
-            <textarea [name]="'qContent' + qi" [(ngModel)]="question.questionContent"
-              placeholder="Écrivez votre question ici..." class="form-control" rows="2" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Description (optionnelle)</label>
-            <input type="text" [name]="'qDesc' + qi" [(ngModel)]="question.description"
-              placeholder="Indice ou explication..." class="form-control" />
-          </div>
-
-          <!-- ── Réponses ── -->
-          <div class="answers-section">
-            <div class="answers-header">
-              <span class="answers-label">Réponses</span>
+            <!-- ── Infos générales ── -->
+            <div class="form-section">
+                <h2 class="section-title">{{ lang.t('form.general_info') }}</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>{{ lang.t('form.description') }} *</label>
+                        <input type="text" name="description" [(ngModel)]="exam.description"
+                               [placeholder]="lang.t('form.description_placeholder')" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label>{{ lang.t('form.status') }}</label>
+                        <select name="status" [(ngModel)]="exam.status" class="form-control">
+                            <option value="CREATED">{{ lang.t('status.CREATED') }}</option>
+                            <option value="ACTIVATED">{{ lang.t('status.ACTIVATED') }}</option>
+                            <option value="SUSPENDED">{{ lang.t('status.SUSPENDED') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ lang.t('form.visibility') }}</label>
+                        <select name="visibility" [(ngModel)]="exam.visibility" class="form-control">
+                            <option value="PRIVATE">{{ lang.t('form.private') }}</option>
+                            <option value="PUBLIC">{{ lang.t('form.public') }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="hasDuration" [(ngModel)]="hasDuration" (change)="onToggleDuration()" />
+                            {{ lang.t('form.has_duration') }}
+                        </label>
+                        <div *ngIf="hasDuration" class="duration-input-wrapper">
+                            <input type="number" name="durationMinutes" [(ngModel)]="exam.durationMinutes"
+                                   min="1" max="600" class="form-control" [placeholder]="lang.t('form.duration_placeholder')" />
+                            <span class="duration-unit">{{ lang.t('form.minutes') }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="answer-item" *ngFor="let answer of question.answers; let ai = index">
-              <input type="text" [name]="'aContent' + qi + '_' + ai" [(ngModel)]="answer.answerContent"
-                placeholder="Contenu de la réponse" class="form-control" required />
+            <!-- ── Questions ── -->
+            <div class="form-section">
+                <div class="section-header">
+                    <h2 class="section-title">{{ lang.t('form.questions_section') }} ({{ exam.questionDTOList?.length || 0 }})</h2>
+                    <div class="section-header-actions">
+                        <button type="button" class="btn-ai" (click)="openAiModal()">
+                            🤖 {{ lang.t('form.generate_ai') }}
+                        </button>
+                        <button type="button" class="btn-primary" (click)="addQuestion()">
+                            + {{ lang.t('form.add_question') }}
+                        </button>
+                    </div>
+                </div>
 
-              <select [name]="'aStatus' + qi + '_' + ai" [(ngModel)]="answer.answerStatus"
-                class="status-select" [ngClass]="answer.answerStatus === 'CORRECT' ? 'correct' : 'wrong'">
-                <option value="CORRECT">✓ Correcte</option>
-                <option value="WRONG">✗ Incorrecte</option>
-              </select>
+                <div class="empty-questions" *ngIf="!exam.questionDTOList?.length">
+                    <p>{{ lang.t('form.no_questions') }}</p>
+                </div>
 
-              <!-- Bouton MAJ réponse — utilise getAnswerState() sans ?. -->
-              <button
-                type="button"
-                class="btn-maj"
-                [ngClass]="{
-                  'saving': getAnswerState(qi, ai).saving,
-                  'saved':  getAnswerState(qi, ai).saved,
-                  'error':  getAnswerState(qi, ai).error
-                }"
-                [disabled]="getAnswerState(qi, ai).saving"
-                (click)="answer.codeAnswer ? updateAnswer(answer, qi, ai) : saveAnswer(answer, question, qi, ai)"
-                [title]="answer.codeAnswer ? 'Mettre à jour la réponse' : 'Enregistrer la réponse'"
-              >
-                <span *ngIf="!getAnswerState(qi, ai).saving && !getAnswerState(qi, ai).saved && !getAnswerState(qi, ai).error">
-                  {{ answer.codeAnswer ? 'MAJ' : '💾' }}
+                <!-- Panneau de navigation entre questions -->
+                <div class="question-nav-panel" *ngIf="exam.questionDTOList && exam.questionDTOList.length > 1">
+                    <button type="button" class="nav-arrow" (click)="prevQuestion()" [disabled]="currentQuestionIndex === 0">
+                        ← {{ lang.t('form.previous_question') }}
+                    </button>
+
+                    <div class="question-nav-chips">
+                        <button type="button"
+                                *ngFor="let q of exam.questionDTOList; let qi = index"
+                                class="nav-chip"
+                                [class.active]="qi === currentQuestionIndex"
+                                [class.filled]="isQuestionFilled(q)"
+                                (click)="goToQuestion(qi)">
+                            {{ qi + 1 }}
+                        </button>
+                    </div>
+
+                    <button type="button" class="nav-arrow" (click)="nextQuestion()"
+                            [disabled]="currentQuestionIndex === (exam.questionDTOList.length - 1)">
+                        {{ lang.t('form.next_question') }} →
+                    </button>
+                </div>
+
+                <!-- Question courante uniquement -->
+                <div class="question-card" *ngIf="exam.questionDTOList && exam.questionDTOList[currentQuestionIndex] as question">
+
+                    <div class="question-header">
+                        <span class="question-number">{{ lang.t('form.question') }} {{ currentQuestionIndex + 1 }} / {{ exam.questionDTOList.length }}</span>
+                        <button type="button" class="btn-icon danger" [title]="lang.t('form.remove_question')" (click)="removeQuestion(currentQuestionIndex)">✕</button>
+                    </div>
+
+                    <!-- Contenu de la question avec éditeur mathématique -->
+                    <div class="form-group">
+                        <label>{{ lang.t('form.question_content') }} *</label>
+                        <app-math-editor
+                                [(ngModel)]="question.questionContent"
+                                [name]="'qContent' + currentQuestionIndex"
+                                [placeholder]="lang.t('form.question_placeholder')">
+                        </app-math-editor>
+                    </div>
+
+                    <!-- ── Pièce jointe : document ou vidéo support de la question ── -->
+                    <div class="form-group">
+                        <label>{{ lang.t('form.attachment') }}</label>
+
+                        <div class="attachment-box" *ngIf="!question.attachmentUrl">
+                            <input type="file"
+                                   #fileInput
+                                   style="display: none"
+                                   [accept]="acceptedAttachmentTypes"
+                                   (change)="onFileSelected($event, question, currentQuestionIndex)">
+
+                            <button type="button" class="btn-outline small"
+                                    [disabled]="getAttachmentState(currentQuestionIndex).saving"
+                                    (click)="fileInput.click()">
+                                <span *ngIf="!getAttachmentState(currentQuestionIndex).saving">📎 {{ lang.t('form.add_attachment') }}</span>
+                                <span *ngIf="getAttachmentState(currentQuestionIndex).saving">⏳ {{ lang.t('form.uploading') }}</span>
+                            </button>
+
+                            <span class="attachment-error" *ngIf="getAttachmentState(currentQuestionIndex).error">
+                    {{ lang.t('form.upload_error') }}
                 </span>
-                <span *ngIf="getAnswerState(qi, ai).saving">⏳</span>
-                <span *ngIf="getAnswerState(qi, ai).saved">✓</span>
-                <span *ngIf="getAnswerState(qi, ai).error">✗</span>
-              </button>
+                            <span class="attachment-hint">{{ lang.t('form.attachment_hint') }}</span>
+                        </div>
 
-              <button type="button" class="btn-icon danger" title="Supprimer la réponse" (click)="removeAnswer(question, ai)">✕</button>
+                        <div class="attachment-preview" *ngIf="question.attachmentUrl">
+                            <span class="attachment-icon">{{ getAttachmentIcon(question.attachmentType) }}</span>
+                            <a [href]="question.attachmentUrl" target="_blank" rel="noopener" class="attachment-name">
+                                {{ question.attachmentName }}
+                            </a>
+                            <button type="button" class="btn-icon danger"
+                                    [title]="lang.t('form.remove_attachment')"
+                                    (click)="removeAttachment(question)">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- ── Réponses ── -->
+                    <div class="answers-section">
+                        <div class="answers-header">
+                            <span class="answers-label">{{ lang.t('form.answers_section') }}</span>
+                        </div>
+
+                        <div class="answer-item" *ngFor="let answer of question.answers; let ai = index">
+                            <app-math-editor
+                                    [(ngModel)]="answer.answerContent"
+                                    [name]="'aContent' + currentQuestionIndex + '_' + ai"
+                                    [placeholder]="lang.t('form.answer_placeholder') + ' ' + (ai + 1)">
+                            </app-math-editor>
+
+                            <select [name]="'aStatus' + currentQuestionIndex + '_' + ai" [(ngModel)]="answer.answerStatus"
+                                    class="status-select" [ngClass]="answer.answerStatus === 'CORRECT' ? 'correct' : 'wrong'">
+                                <option value="CORRECT">✓ {{ lang.t('form.correct_answer') }}</option>
+                                <option value="WRONG">✗ {{ lang.t('form.wrong_answer') }}</option>
+                            </select>
+
+                            <button type="button" class="btn-icon danger"
+                                    [title]="lang.t('form.remove_answer')"
+                                    *ngIf="question.answers && question.answers.length > 1"
+                                    (click)="removeAnswer(question, ai)">✕</button>
+                        </div>
+
+                        <button type="button" class="btn-outline small btn-add-answer" (click)="addAnswer(question)">
+                            + {{ lang.t('form.add_answer') }}
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- Bouton Ajouter une question -->
+                <button type="button" class="btn-add-question" (click)="addQuestion()">
+                    + {{ lang.t('form.add_question') }}
+                </button>
             </div>
 
-            <button type="button" class="btn-add-inline" (click)="addAnswer(question)">
-              + Ajouter une réponse
-            </button>
-          </div>
+            <!-- ── Actions globales ── -->
+            <div class="form-actions">
+                <a routerLink="/exams" class="btn-outline">{{ lang.t('form.cancel') }}</a>
+                <button type="submit" class="btn-primary" [disabled]="saving">
+                    {{ saving ? lang.t('form.saving') : (isEdit ? lang.t('form.update') : lang.t('form.submit')) }}
+                </button>
+            </div>
 
-          <!-- ── Actions question — utilise getQuestionState() sans ?. ── -->
-          <div class="question-actions">
-            <button
-              type="button"
-              class="btn-save-question"
-              [ngClass]="{
-                'saving': getQuestionState(qi).saving,
-                'saved':  getQuestionState(qi).saved,
-                'error':  getQuestionState(qi).error
-              }"
-              [disabled]="getQuestionState(qi).saving || !question.questionContent"
-              (click)="question.codeQuestion ? updateQuestion(question, qi) : saveQuestion(question, qi)"
-            >
-              <span *ngIf="!getQuestionState(qi).saving && !getQuestionState(qi).saved && !getQuestionState(qi).error">
-                {{ question.codeQuestion ? '✎ MAJ question' : '💾 Enregistrer la question' }}
-              </span>
-              <span *ngIf="getQuestionState(qi).saving">⏳ Enregistrement...</span>
-              <span *ngIf="getQuestionState(qi).saved">✓ Enregistré !</span>
-              <span *ngIf="getQuestionState(qi).error">✗ Erreur</span>
-            </button>
-          </div>
+        </form>
+    </div>
+</div>
 
+<!-- Modal Génération de questions par IA -->
+<div class="modal" *ngIf="showAiModal" (click)="$event.target === $event.currentTarget ? closeAiModal() : null">
+    <div class="modal-content modal-md">
+        <div class="modal-header">
+            <h3>🤖 {{ lang.t('form.generate_ai') }}</h3>
+            <button class="close" (click)="closeAiModal()" [disabled]="aiGenerating">&times;</button>
         </div>
+        <div class="modal-body">
+            <div *ngIf="aiError" class="alert alert-danger">{{ aiError }}</div>
 
-        <!-- Bouton Ajouter une question EN BAS -->
-        <button type="button" class="btn-add-question" (click)="addQuestion()">
-          + Ajouter une question
-        </button>
-      </div>
+            <div class="form-group">
+                <label>{{ lang.t('form.ai_subject') }} *</label>
+                <input type="text" [(ngModel)]="aiRequest.subject" name="aiSubject"
+                       [placeholder]="lang.t('form.ai_subject_placeholder')" class="form-control" />
+            </div>
 
-      <!-- ── Actions globales ── -->
-      <div class="form-actions">
-        <a routerLink="/exams" class="btn-outline">Annuler</a>
-        <button type="submit" class="btn-primary" [disabled]="saving">
-          {{ saving ? 'Enregistrement...' : (isEdit ? 'Mettre à jour l\'examen' : 'Créer l\'examen') }}
-        </button>
-      </div>
+            <div class="form-group">
+                <label>{{ lang.t('form.ai_level') }}</label>
+                <input type="text" [(ngModel)]="aiRequest.level" name="aiLevel"
+                       [placeholder]="lang.t('form.ai_level_placeholder')" class="form-control" />
+            </div>
 
-    </form>
-  </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>{{ lang.t('form.ai_count') }}</label>
+                    <input type="number" [(ngModel)]="aiRequest.numberOfQuestions" name="aiCount"
+                           min="1" max="20" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>{{ lang.t('form.ai_language') }}</label>
+                    <select [(ngModel)]="aiRequest.language" name="aiLanguage" class="form-control">
+                        <option value="fr">Français</option>
+                        <option value="ar">العربية</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>{{ lang.t('form.ai_difficulty') }}</label>
+                <select [(ngModel)]="aiRequest.difficulty" name="aiDifficulty" class="form-control">
+                    <option value="FACILE">{{ lang.t('form.ai_difficulty_easy') }}</option>
+                    <option value="MOYEN">{{ lang.t('form.ai_difficulty_medium') }}</option>
+                    <option value="AVANCE">{{ lang.t('form.ai_difficulty_advanced') }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>{{ lang.t('form.ai_reference_file') }}</label>
+
+                <div class="attachment-box" *ngIf="!aiFile">
+                    <input type="file"
+                           #aiFileInput
+                           style="display: none"
+                           [accept]="acceptedAiFileTypes"
+                           (change)="onAiFileSelected($event)">
+
+                    <button type="button" class="btn-outline small" (click)="aiFileInput.click()">
+                        📎 {{ lang.t('form.ai_add_reference_file') }}
+                    </button>
+                    <span class="attachment-hint">{{ lang.t('form.ai_reference_file_hint') }}</span>
+                </div>
+
+                <div class="attachment-preview" *ngIf="aiFile">
+                    <span class="attachment-icon">📄</span>
+                    <span class="attachment-name">{{ aiFile.name }}</span>
+                    <button type="button" class="btn-icon danger"
+                            [title]="lang.t('form.remove_attachment')"
+                            (click)="removeAiFile()">✕</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" [(ngModel)]="aiRequest.allowMultipleCorrectAnswers" name="aiMulti" />
+                    {{ lang.t('form.ai_multiple_correct') }}
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeAiModal()" [disabled]="aiGenerating">{{ lang.t('exams.close') }}</button>
+            <button class="btn-primary" [disabled]="aiGenerating" (click)="generateWithAi()">
+                <span *ngIf="!aiGenerating">🤖 {{ lang.t('form.ai_generate_button') }}</span>
+                <span *ngIf="aiGenerating">⏳ {{ lang.t('form.ai_generating') }}</span>
+            </button>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,200 @@
+.correction-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.correction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.correction-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--border);
+}
+
+.correction-card.correct {
+    border-left-color: var(--success);
+}
+
+.correction-card.incorrect {
+    border-left-color: var(--danger);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+/* Dans test-correction.component.css */
+.icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.icon-ok      { background: #28a745; color: white; }
+.icon-bad     { background: #dc3545; color: white; }
+.icon-missed  { background: #ffc107; color: #333; }
+.icon-neutral { background: #dee2e6; color: #aaa; border: 2px solid #ccc; }
+
+.question-num {
+    all: unset;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.math-accent {
+    font-family: 'Times New Roman', serif;
+    display: inline-block;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.correct {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.incorrect {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+.question-content {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.answers-correction {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.answer-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    background: var(--bg);
+}
+
+.answer-row.user-correct {
+    background: var(--success-light);
+    border-left: 3px solid var(--success);
+}
+
+.answer-row.user-wrong {
+    background: var(--danger-light);
+    border-left: 3px solid var(--danger);
+}
+
+.answer-row.missed-correct {
+    background: #fff3e0;
+    border-left: 3px solid var(--warning);
+}
+
+.answer-icon {
+    width: 32px;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.answer-content {
+    flex: 1;
+}
+
+.answer-status-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.correct-answer-hint {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: var(--primary-light);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+}
+
+.action-buttons {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* ... conservez tout le contenu existant, ajoutez ceci à la fin ... */
+
+.question-attachment {
+    margin: 0.75rem 0 1rem 0;
+}
+
+.attachment-image {
+    max-width: 100%;
+    max-height: 280px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: block;
+}
+
+.attachment-video {
+    max-width: 100%;
+    max-height: 320px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: block;
+    background: #000;
+}
+
+.attachment-file-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.attachment-file-link:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.attachment-icon {
+    font-size: 1.2rem;
+}
+
+.attachment-audio {
+    width: 100%;
+    max-width: 400px;
+    display: block;
+    margin: 0.5rem 0;
+}

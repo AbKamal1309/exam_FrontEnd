@@ -1,57 +1,122 @@
-<app-navbar></app-navbar>
+<div>
+    <app-navbar></app-navbar>
 
-<div class="page-container">
-  <div *ngIf="loading" class="loading-state">Chargement du test...</div>
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-
-  <div *ngIf="!loading && testExam">
-    <div class="test-header">
-      <div>
-        <h1 class="page-title">{{ testExam.examDTO?.description }}</h1>
-        <p class="page-subtitle">Candidat : <strong>{{ testExam.userRequestName }}</strong> | Examinateur : <strong>{{ testExam.userNameExamSetter }}</strong></p>
-      </div>
-      <div class="progress-info">
-        <span>{{ objectKeys(selectedAnswers).length }}/{{ questions.length }} réponses</span>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="progress"></div>
-        </div>
-      </div>
+    <!-- Minuteur flottant, toujours visible peu importe le scroll -->
+    <div class="timer-floating" *ngIf="hasTimer" [ngClass]="timerClass">
+        ⏱️ {{ formatTime(remainingSeconds) }}
     </div>
 
-    <div class="questions-container">
-      <div class="test-question" *ngFor="let q of questions; let qi = index">
-        <div class="question-header-test">
-          <span class="question-badge">Question {{ qi + 1 }}/{{ questions.length }}</span>
-          <span class="answered-check" *ngIf="selectedAnswers[qi] !== undefined">✓</span>
-        </div>
-        <p class="question-text">{{ q.questionContent }}</p>
-        <p class="question-hint" *ngIf="q.description">💡 {{ q.description }}</p>
+    <div class="page-container">
+        <div *ngIf="loading" class="loading-state">{{ lang.t('test.loading') }}</div>
+        <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
 
-        <div class="answers-list">
-          <div
-            class="answer-option"
-            *ngFor="let a of q.answers; let ai = index"
-            [ngClass]="{ 'selected': selectedAnswers[qi] === ai }"
-            (click)="selectAnswer(qi, ai)"
-          >
-            <span class="answer-letter">{{ 'ABCD'[ai] }}</span>
-            <span class="answer-text">{{ a.answerContent }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+        <div *ngIf="!loading && !error && testExam">
+            <!-- En-tête -->
+            <div class="test-header">
+                <div>
+                    <h1 class="page-title">{{ testExam.examDTO?.description }}</h1>
+                    <p class="page-subtitle">
+                        {{ lang.t('test.created_by') }}: {{ testExam.userNameExamSetter }} |
+                        {{ lang.t('test.questions_count') }}: {{ testExam.examDTO?.numberOfQuestions }}
+                    </p>
+                </div>
+                <div class="progress-info">
+                    <div>{{ lang.t('test.progress') }}: {{ answeredCount }}/{{ questions.length }}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="progress"></div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="test-footer">
-      <div *ngIf="!allAnswered" class="warning-text">
-        ⚠ Veuillez répondre à toutes les questions avant de soumettre.
-      </div>
-      <button
-        class="btn-primary btn-lg"
-        [disabled]="!allAnswered || submitting"
-        (click)="submitTest()"
-      >
-        {{ submitting ? 'Envoi en cours...' : '✓ Soumettre le test' }}
-      </button>
+            <!-- Panneau de navigation entre questions -->
+            <div class="question-nav-panel">
+                <button type="button" class="nav-arrow" (click)="prevQuestion()" [disabled]="currentQuestionIndex === 0">
+                    ← {{ lang.t('test.previous') }}
+                </button>
+
+                <div class="question-nav-chips">
+                    <button type="button"
+                            *ngFor="let q of questions; let qi = index"
+                            class="nav-chip"
+                            [class.active]="qi === currentQuestionIndex"
+                            [class.answered]="isQuestionAnswered(qi)"
+                            (click)="goToQuestion(qi)">
+                        {{ qi + 1 }}
+                    </button>
+                </div>
+
+                <button type="button" class="nav-arrow" (click)="nextQuestion()" [disabled]="currentQuestionIndex === questions.length - 1">
+                    {{ lang.t('test.next') }} →
+                </button>
+            </div>
+
+            <!-- Question courante uniquement -->
+            <div class="questions-container" *ngIf="currentQuestion as question">
+                <div class="test-question">
+                    <div class="question-header-test">
+                        <span class="question-badge">{{ lang.t('test.question') }} {{ currentQuestionIndex + 1 }} / {{ questions.length }}</span>
+                        <span class="answered-check" *ngIf="selectedAnswers[currentQuestionIndex]?.length">
+                            ✓ {{ selectedAnswers[currentQuestionIndex].length }} {{ lang.t('test.answers_selected') }}
+                        </span>
+                    </div>
+                    <div class="question-text" [innerHTML]="renderMath(question.questionContent)"></div>
+                    <div class="question-hint" *ngIf="question.description">
+                        💡 <span [innerHTML]="renderMath(question.description)"></span>
+                    </div>
+
+                    <!-- Pièce jointe (document, vidéo ou audio support) -->
+                    <div class="question-attachment" *ngIf="question.attachmentUrl">
+                        <img *ngIf="question.attachmentType === 'IMAGE'"
+                             [src]="api.getFileUrl(question.attachmentUrl)"
+                             [alt]="question.attachmentName"
+                             class="attachment-image" />
+
+                        <video *ngIf="question.attachmentType === 'VIDEO'"
+                               [src]="api.getFileUrl(question.attachmentUrl)"
+                               class="attachment-video"
+                               controls preload="metadata"></video>
+
+                        <audio *ngIf="question.attachmentType === 'AUDIO'"
+                               [src]="api.getFileUrl(question.attachmentUrl)"
+                               class="attachment-audio"
+                               controls preload="metadata"></audio>
+
+                        <a *ngIf="question.attachmentType === 'PDF' || question.attachmentType === 'WORD'"
+                           [href]="api.getFileUrl(question.attachmentUrl)"
+                           target="_blank" rel="noopener"
+                           class="attachment-file-link">
+                            <span class="attachment-icon">{{ getAttachmentIcon(question.attachmentType) }}</span>
+                            <span>{{ question.attachmentName }}</span>
+                        </a>
+                    </div>
+
+                    <div class="answers-list">
+                        <div class="answer-option" *ngFor="let answer of question.answers; let ai = index"
+                             (click)="toggleAnswer(currentQuestionIndex, ai)"
+                             [class.selected]="isSelected(currentQuestionIndex, ai)"
+                             [class.disabled]="timeExpired">
+                            <input type="checkbox"
+                                   [checked]="isSelected(currentQuestionIndex, ai)"
+                                   (click)="$event.stopPropagation()">
+                            <span class="answer-letter">{{ getAnswerLetter(ai) }}</span>
+                            <span class="answer-text" [innerHTML]="renderMath(answer.answerContent)"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <div class="test-footer">
+                <div *ngIf="!allAnswered" class="warning-text">
+                    ⚠️ {{ lang.t('test.warning') }} {{ answeredCount }} {{ lang.t('test.on') }} {{ questions.length }}
+                </div>
+                <button class="btn-primary btn-lg"
+                        (click)="submitTest()"
+                        [disabled]="submitting || !allAnswered">
+                    <span *ngIf="submitting" class="spinner"></span>
+                    {{ submitting ? lang.t('test.submitting') : lang.t('test.submit') }}
+                </button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>

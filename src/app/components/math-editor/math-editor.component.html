@@ -1,0 +1,230 @@
+<div class="math-editor">
+    <!-- Bouton toggle toolbar -->
+    <div class="toolbar-toggle">
+        <button type="button" class="toggle-btn" (click)="showToolbar = !showToolbar">
+            {{ showToolbar ? '🔽 ' + lang.t('math_editor.hide_symbols') : '🔼 ' + lang.t('math_editor.show_symbols') }}
+        </button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="math-toolbar" *ngIf="showToolbar">
+
+        <!-- Intégrales -->
+        <div class="toolbar-group">
+            <span class="group-label">Intégrales</span>
+            <button type="button" class="math-btn" (click)="insert('\\int f(x) dx')" title="Intégrale simple">∫</button>
+            <button type="button" class="math-btn" (click)="insert('\\int_{a}^{b} f(x) dx')" title="Intégrale bornée">∫ₐᵇ</button>
+            <button type="button" class="math-btn" (click)="insert('\\iint f(x,y) dxdy')" title="Intégrale double">∬</button>
+            <button type="button" class="math-btn" (click)="insert('\\iiint f(x,y,z) dxdydz')" title="Intégrale triple">∭</button>
+            <button type="button" class="math-btn" (click)="insert('\\oint f(z) dz')" title="Intégrale curviligne">∮</button>
+        </div>
+
+        <!-- Fractions -->
+        <div class="toolbar-group">
+            <span class="group-label">Fractions</span>
+            <button type="button" class="math-btn" (click)="insert('\\frac{1}{2}')" title="1/2">½</button>
+            <button type="button" class="math-btn" (click)="insert('\\frac{1}{4}')" title="1/4">¼</button>
+            <button type="button" class="math-btn" (click)="insert('\\frac{3}{4}')" title="3/4">¾</button>
+            <button type="button" class="math-btn" (click)="insert('\\frac{a}{b}')" title="a/b">a/b</button>
+        </div>
+
+        <!-- Puissances & Indices -->
+        <div class="toolbar-group">
+            <span class="group-label">Puissances</span>
+            <button type="button" class="math-btn" (click)="insert('x^{2}')" title="Carré">x²</button>
+            <button type="button" class="math-btn" (click)="insert('x^{3}')" title="Cube">x³</button>
+            <button type="button" class="math-btn" (click)="insert('x^{n}')" title="Puissance n">xⁿ</button>
+            <button type="button" class="math-btn" (click)="insert('x^{-1}')" title="Exposant -1">x⁻¹</button>
+            <button type="button" class="math-btn" (click)="insert('x_{n}')" title="Indice n">xₙ</button>
+            <button type="button" class="math-btn" (click)="insert('x_{i}')" title="Indice i">xᵢ</button>
+        </div>
+
+        <!-- Racines -->
+        <div class="toolbar-group">
+            <span class="group-label">Racines</span>
+            <button type="button" class="math-btn" (click)="insert('\\sqrt{x}')" title="Racine carrée">√x</button>
+            <button type="button" class="math-btn" (click)="insert('\\sqrt[3]{x}')" title="Racine cubique">∛x</button>
+            <button type="button" class="math-btn" (click)="insert('\\sqrt[n]{x}')" title="Racine n-ième">ⁿ√x</button>
+        </div>
+
+        <!-- Sommes & Limites -->
+        <div class="toolbar-group">
+            <span class="group-label">Sommes</span>
+            <button type="button" class="math-btn" (click)="insert('\\sum_{i=0}^{n}')" title="Somme">Σ</button>
+            <button type="button" class="math-btn" (click)="insert('\\prod_{k=1}^{N}')" title="Produit">∏</button>
+            <button type="button" class="math-btn" (click)="insert('\\lim_{x \\to 0}')" title="Limite en 0">lim₀</button>
+            <button type="button" class="math-btn" (click)="insert('\\lim_{x \\to \\infty}')" title="Limite en l'infini">lim∞</button>
+        </div>
+
+        <!-- Trigonométrie -->
+        <div class="toolbar-group">
+            <span class="group-label">Trigonométrie</span>
+            <button type="button" class="math-btn" (click)="insert('\\sin(x)')" title="Sinus">sin</button>
+            <button type="button" class="math-btn" (click)="insert('\\cos(x)')" title="Cosinus">cos</button>
+            <button type="button" class="math-btn" (click)="insert('\\tan(x)')" title="Tangente">tan</button>
+            <button type="button" class="math-btn" (click)="insert('\\sin^{-1}(x)')" title="Arc sinus">sin⁻¹</button>
+            <button type="button" class="math-btn" (click)="insert('\\cos^{-1}(x)')" title="Arc cosinus">cos⁻¹</button>
+            <button type="button" class="math-btn" (click)="insert('\\tan^{-1}(x)')" title="Arc tangente">tan⁻¹</button>
+            <button type="button" class="math-btn" (click)="insert('\\ln(x)')" title="Logarithme népérien">ln</button>
+            <button type="button" class="math-btn" (click)="insert('\\log(x)')" title="Logarithme">log</button>
+            <button type="button" class="math-btn" (click)="insert('e^{x}')" title="Exponentielle">eˣ</button>
+        </div>
+
+        <!-- Symboles grecs -->
+        <div class="toolbar-group">
+            <span class="group-label">Grecs</span>
+            <button type="button" class="math-btn" (click)="insert('\\alpha')" title="Alpha">α</button>
+            <button type="button" class="math-btn" (click)="insert('\\beta')" title="Beta">β</button>
+            <button type="button" class="math-btn" (click)="insert('\\gamma')" title="Gamma">γ</button>
+            <button type="button" class="math-btn" (click)="insert('\\delta')" title="Delta">δ</button>
+            <button type="button" class="math-btn" (click)="insert('\\epsilon')" title="Epsilon">ε</button>
+            <button type="button" class="math-btn" (click)="insert('\\zeta')" title="Zêta">ζ</button>
+            <button type="button" class="math-btn" (click)="insert('\\eta')" title="Êta">η</button>
+            <button type="button" class="math-btn" (click)="insert('\\theta')" title="Thêta">θ</button>
+            <button type="button" class="math-btn" (click)="insert('\\kappa')" title="Kappa">κ</button>
+            <button type="button" class="math-btn" (click)="insert('\\lambda')" title="Lambda">λ</button>
+            <button type="button" class="math-btn" (click)="insert('\\mu')" title="Mu">μ</button>
+            <button type="button" class="math-btn" (click)="insert('\\nu')" title="Nu">ν</button>
+            <button type="button" class="math-btn" (click)="insert('\\xi')" title="Xi">ξ</button>
+            <button type="button" class="math-btn" (click)="insert('\\pi')" title="Pi">π</button>
+            <button type="button" class="math-btn" (click)="insert('\\rho')" title="Rho">ρ</button>
+            <button type="button" class="math-btn" (click)="insert('\\sigma')" title="Sigma">σ</button>
+            <button type="button" class="math-btn" (click)="insert('\\tau')" title="Tau">τ</button>
+            <button type="button" class="math-btn" (click)="insert('\\phi')" title="Phi">φ</button>
+            <button type="button" class="math-btn" (click)="insert('\\chi')" title="Chi">χ</button>
+            <button type="button" class="math-btn" (click)="insert('\\psi')" title="Psi">ψ</button>
+            <button type="button" class="math-btn" (click)="insert('\\omega')" title="Oméga">ω</button>
+            <button type="button" class="math-btn" (click)="insert('\\Delta')" title="Delta majuscule">Δ</button>
+            <button type="button" class="math-btn" (click)="insert('\\Sigma')" title="Sigma majuscule">Σ</button>
+            <button type="button" class="math-btn" (click)="insert('\\Omega')" title="Oméga majuscule">Ω</button>
+            <button type="button" class="math-btn" (click)="insert('\\Pi')" title="Pi majuscule">Π</button>
+            <button type="button" class="math-btn" (click)="insert('\\infty')" title="Infini">∞</button>
+        </div>
+
+        <!-- Opérateurs -->
+        <div class="toolbar-group">
+            <span class="group-label">Opérateurs</span>
+            <button type="button" class="math-btn" (click)="insert('+')" title="Plus">+</button>
+            <button type="button" class="math-btn" (click)="insert('-')" title="Moins">-</button>
+            <button type="button" class="math-btn" (click)="insert('\\times')" title="Multiplication">×</button>
+            <button type="button" class="math-btn" (click)="insert('\\div')" title="Division">÷</button>
+            <button type="button" class="math-btn" (click)="insert('\\cdot')" title="Point de multiplication">·</button>
+            <button type="button" class="math-btn" (click)="insert('=')" title="Égal">=</button>
+            <button type="button" class="math-btn" (click)="insert('\\pm')" title="Plus ou moins">±</button>
+            <button type="button" class="math-btn" (click)="insert('\\mp')" title="Moins ou plus">∓</button>
+            <button type="button" class="math-btn" (click)="insert('\\neq')" title="Différent">≠</button>
+            <button type="button" class="math-btn" (click)="insert('\\leq')" title="Inférieur ou égal">≤</button>
+            <button type="button" class="math-btn" (click)="insert('\\geq')" title="Supérieur ou égal">≥</button>
+            <button type="button" class="math-btn" (click)="insert('\\approx')" title="Environ">≈</button>
+            <button type="button" class="math-btn" (click)="insert('%')" title="Pourcentage">%</button>
+            <button type="button" class="math-btn" (click)="insert('!')" title="Factorielle">!</button>
+        </div>
+
+        <!-- Relations -->
+        <div class="toolbar-group">
+            <span class="group-label">Relations</span>
+            <button type="button" class="math-btn" (click)="insert('\\equiv')" title="Équivalent">≡</button>
+            <button type="button" class="math-btn" (click)="insert('\\propto')" title="Proportionnel">∝</button>
+            <button type="button" class="math-btn" (click)="insert('\\sim')" title="Similaire">∼</button>
+        </div>
+
+        <!-- Ensembles -->
+        <div class="toolbar-group">
+            <span class="group-label">Ensembles</span>
+            <button type="button" class="math-btn" (click)="insert('\\in')" title="Appartient">∈</button>
+            <button type="button" class="math-btn" (click)="insert('\\notin')" title="N'appartient pas">∉</button>
+            <button type="button" class="math-btn" (click)="insert('\\subset')" title="Sous-ensemble">⊂</button>
+            <button type="button" class="math-btn" (click)="insert('\\subseteq')" title="Sous-ensemble ou égal">⊆</button>
+            <button type="button" class="math-btn" (click)="insert('\\supset')" title="Sur-ensemble">⊃</button>
+            <button type="button" class="math-btn" (click)="insert('\\supseteq')" title="Sur-ensemble ou égal">⊇</button>
+            <button type="button" class="math-btn" (click)="insert('\\cup')" title="Union">∪</button>
+            <button type="button" class="math-btn" (click)="insert('\\cap')" title="Intersection">∩</button>
+            <button type="button" class="math-btn" (click)="insert('\\emptyset')" title="Ensemble vide">∅</button>
+            <button type="button" class="math-btn" (click)="insert('\\mathbb{R}')" title="Ensemble des réels">ℝ</button>
+            <button type="button" class="math-btn" (click)="insert('\\mathbb{N}')" title="Ensemble des naturels">ℕ</button>
+            <button type="button" class="math-btn" (click)="insert('\\mathbb{Z}')" title="Ensemble des entiers">ℤ</button>
+            <button type="button" class="math-btn" (click)="insert('\\mathbb{Q}')" title="Ensemble des rationnels">ℚ</button>
+            <button type="button" class="math-btn" (click)="insert('\\mathbb{C}')" title="Ensemble des complexes">ℂ</button>
+        </div>
+
+        <!-- Logique -->
+        <div class="toolbar-group">
+            <span class="group-label">Logique</span>
+            <button type="button" class="math-btn" (click)="insert('\\land')" title="Et logique">∧</button>
+            <button type="button" class="math-btn" (click)="insert('\\lor')" title="Ou logique">∨</button>
+            <button type="button" class="math-btn" (click)="insert('\\neg')" title="Négation">¬</button>
+            <button type="button" class="math-btn" (click)="insert('\\forall')" title="Quel que soit">∀</button>
+            <button type="button" class="math-btn" (click)="insert('\\exists')" title="Il existe">∃</button>
+        </div>
+
+        <!-- Flèches -->
+        <div class="toolbar-group">
+            <span class="group-label">Flèches</span>
+            <button type="button" class="math-btn" (click)="insert('\\rightarrow')" title="Flèche droite">→</button>
+            <button type="button" class="math-btn" (click)="insert('\\leftarrow')" title="Flèche gauche">←</button>
+            <button type="button" class="math-btn" (click)="insert('\\leftrightarrow')" title="Flèche double">↔</button>
+            <button type="button" class="math-btn" (click)="insert('\\longrightarrow')" title="Longue flèche droite">⟶</button>
+            <button type="button" class="math-btn" (click)="insert('\\mapsto')" title="Correspond à">↦</button>
+            <button type="button" class="math-btn" (click)="insert('\\Rightarrow')" title="Implique">⇒</button>
+            <button type="button" class="math-btn" (click)="insert('\\Leftrightarrow')" title="Équivalent logique">⇔</button>
+        </div>
+
+        <!-- Vecteurs & Divers -->
+        <div class="toolbar-group">
+            <span class="group-label">Vecteurs</span>
+            <button type="button" class="math-btn" (click)="insert('\\vec{v}')" title="Vecteur">v⃗</button>
+            <button type="button" class="math-btn" (click)="insert('\\hat{x}')" title="Chapeau">x̂</button>
+            <button type="button" class="math-btn" (click)="insert('\\bar{x}')" title="Barre">x̄</button>
+            <button type="button" class="math-btn" (click)="insert('\\partial')" title="Dérivée partielle">∂</button>
+            <button type="button" class="math-btn" (click)="insert('\\nabla')" title="Nabla">∇</button>
+            <button type="button" class="math-btn" (click)="insert('^{\\circ}')" title="Degré">°</button>
+            <button type="button" class="math-btn" (click)="insert('\\therefore')" title="Donc">∴</button>
+            <button type="button" class="math-btn" (click)="insert('\\because')" title="Car">∵</button>
+            <button type="button" class="math-btn" (click)="insert('\\ldots')" title="Points de suspension">…</button>
+        </div>
+
+    </div>
+
+    <!-- Zone de saisie -->
+    <div class="editor-area">
+        <textarea
+            #mathTextarea
+            [value]="value"
+            (input)="onInput($event)"
+            class="math-textarea"
+            [placeholder]="placeholder"
+            rows="3"
+        ></textarea>
+
+        <!-- Boutons d'options sous la zone de saisie -->
+        <div class="math-options">
+            <button type="button" class="btn-option" (click)="toggleDescription()">
+                <span class="option-icon">📝</span>
+                {{ showDescription ? lang.t('math_editor.hide_description') : lang.t('math_editor.add_description') }}
+            </button>
+            <button type="button" class="btn-option" (click)="togglePreview()">
+                <span class="option-icon">👁️</span>
+                {{ showPreview ? lang.t('math_editor.hide_preview') : lang.t('math_editor.show_preview') }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Description (masquée par défaut) -->
+    <div class="math-description" *ngIf="showDescription">
+        <label class="description-label">📝 {{ lang.t('form.question_description') }}</label>
+        <input type="text"
+               [(ngModel)]="description"
+               (input)="onDescriptionChange()"
+               class="description-input"
+               [placeholder]="lang.t('form.question_desc_placeholder')" />
+    </div>
+
+    <!-- Aperçu (masqué par défaut) -->
+    <div class="math-preview" *ngIf="showPreview && value">
+        <div class="preview-header">
+            <span class="preview-label">📐 Aperçu :</span>
+            <span class="preview-hint">(rendu mathématique)</span>
+        </div>
+        <div class="preview-content" [innerHTML]="previewHtml"></div>
+    </div>
+</div>

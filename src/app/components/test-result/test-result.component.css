@@ -1,1 +1,152 @@
-/* Styles dans src/styles.css */
+.result-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.score-hero {
+    text-align: center;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+}
+
+.score-hero.excellent {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.score-hero.good {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+.score-hero.average {
+    background: linear-gradient(135deg, #fffbeb, #fef9c3);
+}
+
+.score-hero.poor {
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+}
+
+.score-circle {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.score-number {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.score-total {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.score-percent {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.score-message {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.result-details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-details h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-item.success {
+    background: var(--success-light);
+}
+
+.detail-item.danger {
+    background: var(--danger-light);
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.result-message {
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+/* Dans test-result.component.css */
+.result-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+

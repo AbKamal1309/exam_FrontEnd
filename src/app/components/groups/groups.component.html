@@ -1,0 +1,278 @@
+<div>
+    <app-navbar></app-navbar>
+    <div class="page-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ lang.t('groups.title') }}</h1>
+                <p class="page-subtitle">{{ lang.t('groups.subtitle') }}</p>
+            </div>
+            <button class="btn-primary" (click)="showCreateModal = true">
+                + {{ lang.t('groups.create') }}
+            </button>
+        </div>
+
+        <!-- Chargement -->
+        <div *ngIf="loading" class="loading-state">
+            {{ lang.t('groups.loading') }}
+        </div>
+
+        <!-- Aucun groupe -->
+        <div *ngIf="!loading && myGroups.length === 0" class="empty-state">
+            <p>{{ lang.t('groups.empty') }}</p>
+            <button class="btn-primary" (click)="showCreateModal = true">
+                {{ lang.t('groups.create_first') }}
+            </button>
+        </div>
+
+        <!-- Liste des groupes -->
+        <div class="groups-grid" *ngIf="!loading && myGroups.length > 0">
+            <div class="group-card" *ngFor="let group of myGroups; trackBy: trackByGroupId">
+
+                <!-- Demandes en attente -->
+
+                <!-- En-tête -->
+                <div class="group-header">
+                    <h3>{{ group.name }}</h3>
+                    <div class="group-actions">
+                        <div class="group-visibility-badge"
+                             *ngIf="group.creatorId === auth.getCurrentUserId()"
+                             [class.public]="group.visibility === 'PUBLIC'"
+                             [class.private]="group.visibility === 'PRIVATE'"
+                             (click)="toggleGroupVisibility(group)">
+                            {{ group.visibility === 'PUBLIC' ? '🌍 Public' : '🔒 Privé' }}
+                            <span class="edit-icon">✎</span>
+                        </div>
+                        <div class="icon-with-badge">
+                            <div class="tooltip-container">
+                                <button class="btn-icon"
+                                        [disabled]="!isAdminOfGroup(group, auth.getCurrentUserId())"
+                                        (click)="isAdminOfGroup(group, auth.getCurrentUserId()) && openRequestsModal(group)">
+                                    📬
+                                </button>
+                                <span class="tooltip-text" *ngIf="!isAdminOfGroup(group, auth.getCurrentUserId())">
+            {{ lang.t('groups.requests_disabled_title') }}
+        </span>
+                            </div>
+                            <span class="badge-requests" *ngIf="getPendingRequestsCount(group) > 0">
+                {{ getPendingRequestsCount(group) }}
+            </span>
+                        </div>
+                        <button class="btn-icon danger" (click)="deleteGroup(group.id,group.name)"
+                                *ngIf="group.creatorId === auth.getCurrentUserId()"
+                                [title]="lang.t('groups.delete_group')">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <p class="group-desc">{{ group.description || lang.t('groups.no_description') }}</p>
+
+                <!-- Métadonnées -->
+                <div class="group-meta">
+                    <span>👑 {{ group.creatorName }}</span>
+                    <span>👥 {{ group.membersCount }} {{ lang.t('groups.members') }}</span>
+                    <span>⭐ {{ group.adminsCount }} {{ lang.t('groups.admins') }}</span>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="group-buttons">
+                    <!-- Bouton Ajouter un membre -->
+                    <div class="tooltip-container">
+                        <button class="btn-outline small"
+                                [disabled]="!isAdminOfGroup(group, auth.getCurrentUserId())"
+                                (click)="openAddMemberModal(group)">
+                            + {{ lang.t('groups.add_member') }}
+                        </button>
+                        <span class="tooltip-text">
+            {{ isAdminOfGroup(group, auth.getCurrentUserId()) ? lang.t('groups.add_member_tooltip') : lang.t('groups.add_member_disabled_tooltip') }}
+        </span>
+                    </div>
+
+                    <!-- Bouton Ajouter un examen -->
+                    <div class="tooltip-container">
+                        <button class="btn-outline small"
+                                [disabled]="!isAdminOfGroup(group, auth.getCurrentUserId())"
+                                (click)="openAddExamModal(group)">
+                            📚 {{ lang.t('groups.add_exam') }}
+                        </button>
+                        <span class="tooltip-text">
+            {{ isAdminOfGroup(group, auth.getCurrentUserId()) ? lang.t('groups.add_exam_tooltip') : lang.t('groups.add_exam_disabled_tooltip') }}
+        </span>
+                    </div>
+                </div>
+                <!-- Liste des membres -->
+                <div class="members-list" *ngIf="group.members && group.members.length > 0">
+                    <div class="members-title">{{ lang.t('groups.members') }} ({{ group.members.length }})</div>
+                    <div class="member-item" *ngFor="let member of group.members.slice(0, 5)">
+                        <span class="member-name">{{ member.name }}</span>
+                        <span class="member-badge" *ngIf="isAdminOfGroup(group, member.id)">{{ lang.t('groups.admin_badge') }}</span>
+                        <button class="btn-icon small danger"
+                                *ngIf="isAdminOfGroup(group, auth.getCurrentUserId()) && member.id !== auth.getCurrentUserId()"
+                                (click)="removeMember(group.id, member.id)"
+                                [title]="lang.t('groups.remove_member')">
+                            ❌
+                        </button>
+                    </div>
+                    <div *ngIf="group.members.length > 5" class="more-members">
+                        +{{ group.members.length - 5 }} {{ lang.t('groups.more_members') }}
+                    </div>
+                </div>
+
+                <!-- Examens partagés -->
+                <div class="shared-exams-list" *ngIf="getSharedExams(group).length > 0">
+                    <div class="shared-exams-title">{{ lang.t('groups.shared_exams') }} ({{ getSharedExams(group).length }})</div>
+                    <div class="shared-exam-item" *ngFor="let exam of getSharedExams(group)">
+                        <div class="exam-info">
+                            <span class="exam-name">{{ exam.description }}</span>
+                            <span class="exam-creator">{{ lang.t('groups.by') }} {{ getExamCreatorName(exam) }}</span>
+                        </div>
+                        <div class="exam-actions-group">
+                            <button class="btn-icon small" (click)="viewExam(exam.codeExam)" [title]="lang.t('groups.view_exam')">
+                                👁️
+                            </button>
+                            <div class="tooltip-container">
+                                <button class="btn-icon small danger"
+                                        [disabled]="!isAdminOfGroup(group, auth.getCurrentUserId())"
+                                        (click)="removeExamFromGroup(group.id, exam.codeExam!, exam.description)"
+                                        [title]="isAdminOfGroup(group, auth.getCurrentUserId()) ? lang.t('groups.remove_exam') : ''">
+                                    🗑️
+                                </button>
+                                <span class="tooltip-text" *ngIf="!isAdminOfGroup(group, auth.getCurrentUserId())">
+            {{ lang.t('groups.remove_exam_disabled_tooltip') }}
+        </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal Création Groupe -->
+    <div class="modal" *ngIf="showCreateModal" (click)="$event.target === $event.currentTarget ? showCreateModal = false : null">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ lang.t('groups.create_new') }}</h3>
+                <button class="close" (click)="showCreateModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ lang.t('groups.name') }} *</label>
+                    <input type="text" [(ngModel)]="newGroup.name" class="form-control" [placeholder]="lang.t('groups.name_placeholder')">
+                </div>
+                <div class="form-group">
+                    <label>{{ lang.t('groups.description') }}</label>
+                    <textarea [(ngModel)]="newGroup.description" class="form-control" [placeholder]="lang.t('groups.desc_placeholder')"></textarea>
+                </div>
+
+                <!-- Checkbox pour la visibilité -->
+                <div class="form-group visibility-option">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="isPublicGroup">
+                        <span>🌍 {{ lang.t('groups.make_public') }}</span>
+                    </label>
+                    <small class="help-text">{{ lang.t('groups.public_hint') }}</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="showCreateModal = false">{{ lang.t('groups.cancel') }}</button>
+                <button class="btn-primary" (click)="createGroup()">{{ lang.t('groups.create') }}</button>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== MODAL AJOUTER MEMBRE ==================== -->
+    <div class="modal" *ngIf="showAddMemberModal" (click)="$event.target === $event.currentTarget ? showAddMemberModal = false : null">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ lang.t('groups.add_member_to') }} {{ selectedGroup?.name }}</h3>
+                <button class="close" (click)="showAddMemberModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ lang.t('groups.search_user') }}</label>
+                    <input type="text" [(ngModel)]="memberSearch" class="form-control" [placeholder]="lang.t('groups.search_placeholder')">
+                </div>
+                <div class="users-list">
+                    <div class="user-item" *ngFor="let user of getFilteredUsers(); trackBy: trackByUserId"
+                         [class.selected]="selectedUserId === user.id"
+                         (click)="selectUser(user)">
+                        <div class="user-info">
+                            <strong>{{ user.name }}</strong>
+                            <small>{{ user.email }}</small>
+                        </div>
+                        <span class="check" *ngIf="selectedUserId === user.id">✓</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="showAddMemberModal = false">{{ lang.t('groups.cancel') }}</button>
+                <button class="btn-primary" (click)="addMember()" [disabled]="selectedUserId === 0">
+                    {{ lang.t('groups.add') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL AJOUTER EXAMEN ==================== -->
+    <div class="modal" *ngIf="showAddExamModal" (click)="$event.target === $event.currentTarget ? showAddExamModal = false : null">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ lang.t('groups.add_exam_to') }} {{ selectedGroup?.name }}</h3>
+                <button class="close" (click)="showAddExamModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>{{ lang.t('groups.select_exam') }}</label>
+                    <select [(ngModel)]="selectedExamCode" class="form-control">
+                        <option value="">{{ lang.t('groups.choose_exam') }}</option>
+                        <option *ngFor="let exam of availableExams" [value]="exam.codeExam">
+                            {{ exam.description }} ({{ exam.codeExam }})
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="showAddExamModal = false">{{ lang.t('groups.cancel') }}</button>
+                <button class="btn-primary" (click)="shareExam()" [disabled]="!selectedExamCode">
+                    {{ lang.t('groups.share') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DEMANDES D'ADHÉSION ==================== -->
+    <div class="modal" *ngIf="showRequestsModal" (click)="$event.target === $event.currentTarget ? showRequestsModal = false : null">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{ lang.t('groups.join_requests') }} - {{ selectedGroup?.name }}</h3>
+                <button class="close" (click)="showRequestsModal = false">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Vérification que selectedGroup existe -->
+                <ng-container *ngIf="selectedGroup; else noGroup">
+                    <!-- Vérification qu'il y a des demandes -->
+                    <ng-container *ngIf="pendingRequests[selectedGroup.id] && pendingRequests[selectedGroup.id].length > 0; else noRequests">
+                        <div class="request-item" *ngFor="let req of pendingRequests[selectedGroup.id]">
+                            <div class="request-info">
+                                <strong>{{ req.userName }}</strong>
+                                <small>{{ req.userEmail }}</small>
+                                <div class="request-date">{{ req.requestDate | date:'dd/MM/yyyy HH:mm' }}</div>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-success small" (click)="acceptRequest(req)">✓ {{ lang.t('groups.accept') }}</button>
+                                <button class="btn-danger small" (click)="rejectRequest(req)">✗ {{ lang.t('groups.reject') }}</button>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-template #noRequests>
+                        <div class="empty-requests">{{ lang.t('groups.no_requests') }}</div>
+                    </ng-template>
+                </ng-container>
+                <ng-template #noGroup>
+                    <div class="empty-requests">{{ lang.t('groups.no_group_selected') }}</div>
+                </ng-template>
+            </div>
+        </div>
+    </div>

@@ -1,1 +1,662 @@
-/* Styles dans src/styles.css */
+/* ==================== MODALES ==================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+}
+
+.close {
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close:hover {
+    color: var(--danger);
+}
+
+.modal-lg {
+    max-width: 700px;
+}
+
+/* ==================== BARRE DE RECHERCHE ==================== */
+
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+
+.search-bar .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: all 0.2s;
+}
+
+.search-bar .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ==================== LISTE DES GROUPES ==================== */
+
+.groups-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.groups-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.groups-list::-webkit-scrollbar-track {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.groups-list::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+/* ==================== CARTE GROUPE (MODAL) ==================== */
+
+.group-card-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: all 0.2s;
+}
+
+.group-card-modal:hover {
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+}
+
+.group-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.group-name {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.group-name strong {
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.group-visibility {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.group-visibility.public {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+}
+
+.group-visibility.private {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+.group-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.group-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.group-meta small {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+/* ==================== BOUTON REJOINDRE ==================== */
+
+.btn-join {
+    flex-shrink: 0;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-join.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.btn-join.btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-join.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-join.btn-outline:hover:not(:disabled) {
+    background: var(--primary-light);
+    transform: translateY(-1px);
+}
+
+.btn-join:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ==================== EXAMEN META (LIGNE D'INFORMATIONS) ==================== */
+
+.exam-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+.exam-meta > * {
+    white-space: nowrap;
+}
+
+/* ==================== BADGE VISIBILITÉ EXAMEN ==================== */
+
+.exam-visibility-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.exam-visibility-badge.public {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+}
+
+.exam-visibility-badge.private {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+.exam-visibility-badge:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+.edit-icon {
+    font-size: 0.6rem;
+    opacity: 0.7;
+}
+
+/* ==================== BADGE TESTS ==================== */
+
+.tests-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tests-badge:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.02);
+}
+
+/* ==================== BOUTONS EXAMENS ==================== */
+
+.exam-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.btn-outline.small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 500;
+}
+
+.btn-outline.small:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.btn-outline.small:active {
+    transform: translateY(0);
+}
+
+.btn-outline.small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-outline.small:disabled:hover {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+}
+
+/* ==================== MESSAGES ==================== */
+
+.info-text,
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}
+
+/* ==================== STATISTIQUES ==================== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+}
+
+.stat-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ==================== GRILLE EXAMENS ==================== */
+
+.exams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.exam-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.exam-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.exam-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.exam-code {
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: var(--primary);
+    background: var(--primary-light);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+
+.exam-desc {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.status-badge.activated {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.status-badge.created {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.status-badge.suspended {
+    background: var(--danger-light);
+    color: var(--danger);
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 640px) {
+    .group-card-modal {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-join {
+        align-self: flex-end;
+        margin-top: 0.5rem;
+    }
+
+    .group-name {
+        flex-wrap: wrap;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .exam-actions {
+        flex-direction: column;
+    }
+
+    .exam-actions .btn-outline.small {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .exams-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .exam-meta {
+        gap: 0.5rem;
+    }
+}
+/* ==================== TABLEAU DES TESTS ==================== */
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.tests-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tests-table th,
+.tests-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.tests-table th {
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.tests-table td {
+    font-size: 0.85rem;
+}
+
+/* ==================== BADGE DE SCORE ==================== */
+
+.score-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.score-badge.high {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+}
+
+.score-badge.medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+}
+
+.score-badge.low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+/* ==================== MODAL TAILLE LARGE ==================== */
+
+.modal-lg {
+    max-width: 800px;
+    width: 90%;
+}
+
+/* ==================== BOUTON ICÔNE PETIT ==================== */
+
+.btn-icon-small {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.3rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-small:hover {
+    background: var(--primary-light);
+    transform: scale(1.05);
+}
+
+/* ==================== MODAL TAILLE MOYENNE ==================== */
+
+.modal-md {
+    max-width: 500px;
+    width: 90%;
+}
+
+/* ==================== CONTENEUR DES DÉTAILS ==================== */
+
+.details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.detail-value {
+    font-weight: 500;
+    color: var(--text);
+}
+
+.detail-value.success {
+    color: var(--success);
+}
+
+.detail-value.danger {
+    color: var(--danger);
+}
+
+.detail-value.code {
+    font-family: monospace;
+    font-size: 0.8rem;
+    background: var(--bg);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}

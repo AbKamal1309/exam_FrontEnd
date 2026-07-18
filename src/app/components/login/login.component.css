@@ -1,1 +1,27 @@
 /* Styles dans src/styles.css */
+.divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 30px);
+    height: 1px;
+    background: var(--border);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+.divider span {
+    background: var(--surface);
+    padding: 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.google-btn-container {
+    margin: 1rem 0;
+}
