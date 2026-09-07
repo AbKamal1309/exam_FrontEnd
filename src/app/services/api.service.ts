@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 import {
   UserDTO, ExamDTO, QuestionDTO, AnswerDTO,
@@ -37,7 +38,7 @@ export interface AdminStats {
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
-  private base = 'http://localhost:8085';
+  private base = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

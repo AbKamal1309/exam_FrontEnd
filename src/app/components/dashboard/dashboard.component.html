@@ -48,7 +48,9 @@
             <div class="exams-grid" *ngIf="!loading && myExams.length > 0">
                 <div class="exam-card" *ngFor="let exam of myExams.slice(0, 6)">
                     <div class="exam-card-header">
-                        <span class="exam-code">{{ exam.codeExam }}</span>
+                        <span class="exam-code" (click)="copyExamCode(exam.codeExam)" [title]="exam.codeExam" style="cursor:pointer;">
+                            {{ exam.codeExam?.substring(0, 8) }}… 📋
+                        </span>
                         <div class="header-right">
                             <span class="status-badge"
                                   [class.activated]="exam.status === 'ACTIVATED'"
@@ -67,7 +69,7 @@
                               [class.public]="exam.visibility === 'PUBLIC'"
                               [class.private]="exam.visibility === 'PRIVATE'"
                               (click)="toggleVisibility(exam)">
-    {{ exam.visibility === 'PUBLIC' ? '🌍 Public' : '🔒 Privé' }}
+    {{ exam.visibility === 'PUBLIC' ? '🌍 ' + lang.t('form.public') : '🔒 ' + lang.t('form.private') }}
                             <span class="edit-icon">✎</span>
 </span>                        <!-- Badge des tests -->
                         <span class="tests-badge" (click)="openTestsModal(exam)" *ngIf="canViewTests(exam)">
@@ -91,8 +93,10 @@
             <div class="exams-grid">
                 <div class="exam-card" *ngFor="let exam of publicExams.slice(0, 6)">
                     <div class="exam-card-header">
-                        <span class="exam-code">{{ exam.codeExam }}</span>
-                        <span class="status-badge">🌍 Public</span>
+                        <span class="exam-code" (click)="copyExamCode(exam.codeExam)" [title]="exam.codeExam" style="cursor:pointer;">
+                            {{ exam.codeExam?.substring(0, 8) }}… 📋
+                        </span>
+                        <span class="status-badge">🌍 {{ lang.t('form.public') }}</span>
                     </div>
                     <div class="exam-desc">{{ exam.description }}</div>
                     <div class="exam-meta">
@@ -114,7 +118,9 @@
             <div class="exams-grid">
                 <div class="exam-card" *ngFor="let exam of sharedExams">
                     <div class="exam-card-header">
-                        <span class="exam-code">{{ exam.codeExam }}</span>
+                        <span class="exam-code" (click)="copyExamCode(exam.codeExam)" [title]="exam.codeExam" style="cursor:pointer;">
+                            {{ exam.codeExam?.substring(0, 8) }}… 📋
+                        </span>
                         <span class="status-badge">👥 Partagé</span>
                     </div>
                     <div class="exam-desc">{{ exam.description }}</div>
@@ -130,16 +136,6 @@
             </div>
         </div>
 
-        <!-- Examens populaires -->
-        <div class="section">
-            <h2 class="section-title">{{ lang.t('dashboard.popular') }}</h2>
-            <div class="popular-list">
-                <div class="popular-item" *ngFor="let exam of popularExams.slice(0, 5); let i = index">
-                    <span class="popular-rank">#{{ i+1 }}</span>
-                    <span class="popular-name">{{ exam }}</span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Modal Partager un examen -->
@@ -203,7 +199,7 @@
                             <div class="group-name">
                                 <strong>{{ group.name }}</strong>
                                 <span class="group-visibility" [class.public]="group.visibility === 'PUBLIC'" [class.private]="group.visibility === 'PRIVATE'">
-                                {{ group.visibility === 'PUBLIC' ? '🌍 Public' : '🔒 Privé' }}
+                                {{ group.visibility === 'PUBLIC' ? '🌍 ' + lang.t('form.public') : '🔒 ' + lang.t('form.private') }}
                             </span>
                             </div>
                             <p class="group-desc">{{ group.description || lang.t('groups.no_description') }}</p>

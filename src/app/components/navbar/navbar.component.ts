@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 
       <a routerLink="/" class="nav-brand">
         <span class="brand-icon">⬡</span>
-        <span>ExamPlatform</span>
+        <span>Amtihan</span>
       </a>
 
       <div class="nav-links" *ngIf="auth.isLoggedIn">
@@ -25,11 +25,9 @@ import { CommonModule } from '@angular/common';
 
       <div class="nav-right">
 
-        <!-- Bouton langue -->
-        <button class="btn-lang" (click)="lang.toggle()" [title]="lang.isRtl ? 'Passer en français' : 'التبديل إلى العربية'">
-          <!--          <span class="lang-flag">{{ lang.isRtl ? '🇫🇷' : '🇲🇦' }}</span>-->
-
-          <span class="lang-label">{{ lang.isRtl ? 'FR' : 'AR' }}</span>
+        <!-- Bouton langue : cycle fr → en → ar → fr..., affiche la langue courante -->
+        <button class="btn-lang" (click)="lang.toggle()" title="Change language">
+          <span class="lang-label">{{ lang.lang().toUpperCase() }}</span>
         </button>
 
         <!-- Non connecté -->

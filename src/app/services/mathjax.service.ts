@@ -21,6 +21,13 @@ export class MathJaxService {
     private process(raw: string): string {
         let s = raw;
 
+        // 0. \left / \right — ne servent en LaTeX qu'à dimensionner automatiquement
+        //    le délimiteur qui suit (parenthèse, crochet...), aucun rendu visuel
+        //    propre. Traité EN PREMIER, avant tout le reste, car "\left\{" ou
+        //    "\right\}" contiennent une accolade qui perturberait sinon la
+        //    détection des groupes {...} des fractions/racines plus bas.
+        s = this.processLeftRight(s);
+
         // 1. Intégrales avec bornes  AVANT tout remplacement de \int
         s = this.processIntegrals(s);
 
@@ -63,6 +70,18 @@ export class MathJaxService {
         s = s.replace(/\$([^$\n]+?)\$/g, (_m, e) =>
             `<span class="math-inline">${e}</span>`);
 
+        return s;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  0. \left / \right — dimensionnement automatique des délimiteurs
+    //  "\left." / "\right." = délimiteur invisible (disparaît entièrement),
+    //  sinon on retire seulement la commande et on garde le délimiteur qui
+    //  suit tel quel (ex: "\left(" -> "(", "\right)" -> ")").
+    // ─────────────────────────────────────────────────────────────
+    private processLeftRight(s: string): string {
+        s = s.replace(/\\(left|right)\./g, '');
+        s = s.replace(/\\(left|right)/g, '');
         return s;
     }
 

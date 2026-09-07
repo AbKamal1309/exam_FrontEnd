@@ -579,4 +579,22 @@ export class DashboardComponent implements OnInit {
   get suspendedCount() {
     return this.myExams.filter(e => e.status === 'SUSPENDED').length;
   }
+
+  // ==================== CODE EXAMEN COPIABLE ====================
+  // Même logique que la version mobile : au lieu d'afficher le code en pleine
+  // largeur, on le rend compact et on permet de le copier au clic plutôt que de
+  // le laisser prendre toute la place visuellement.
+  copyExamCode(code: string | undefined) {
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: this.lang.t('dashboard.code_copied'),
+        showConfirmButton: false,
+        timer: 1500
+      });
+    });
+  }
 }

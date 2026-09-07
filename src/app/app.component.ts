@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import {SessionService} from "./services/session.service";
 import {AuthService} from "./services/auth.service";
 
@@ -14,6 +14,7 @@ export class AppComponent implements OnInit ,OnDestroy  {
   constructor(
       private sessionService : SessionService,
       private authService : AuthService,
+      private router: Router,
   ) {}
 
   ngOnInit() {
@@ -28,6 +29,14 @@ export class AppComponent implements OnInit ,OnDestroy  {
         this.sessionService.startSessionMonitoring();
       } else {
         this.sessionService.stopSessionMonitoring();
+        // Filet de sécurité : si la session devient nulle (déconnexion, refresh
+        // échoué, timer d'inactivité...) pendant que l'utilisateur est sur une
+        // page protégée, on force la redirection ici plutôt que de dépendre
+        // uniquement du code qui a déclenché la déconnexion pour y penser.
+        const publicRoutes = ['/', '/login', '/register'];
+        if (!publicRoutes.includes(this.router.url)) {
+          this.router.navigate(['/login']);
+        }
       }
     });
   }

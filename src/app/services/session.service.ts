@@ -76,8 +76,19 @@ export class SessionService  {
         this.stopSessionMonitoring();
         this.authService.logout();
         this.router.navigate(['/login']);
-        // Message informatif (optionnel)
-        alert('⏱️ Votre session a expiré pour cause d\'inactivité.');
+        // alert() est bloquant : si l'utilisateur n'est pas devant l'écran, il peut
+        // geler l'exécution JS et empêcher Angular de terminer le rendu de la
+        // navigation vers /login — laissant l'ancienne page affichée avec un état
+        // "vide" (session déjà effacée côté authService, mais route pas changée
+        // visuellement). Un toast non-bloquant ne peut plus provoquer ce blocage.
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'info',
+            title: 'Votre session a expiré pour cause d\'inactivité.',
+            showConfirmButton: false,
+            timer: 4000
+        });
     }
 
     private clearTimers() {
