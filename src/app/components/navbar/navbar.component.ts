@@ -12,8 +12,17 @@ import { CommonModule } from '@angular/common';
     <nav class="navbar">
 
       <a routerLink="/" class="nav-brand">
-        <span class="brand-icon">⬡</span>
-        <span>Amtihan</span>
+        <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#2563eb"/>
+              <stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+          </defs>
+          <path d="M16 2L28.6 9V23L16 30L3.4 23V9L16 2Z" fill="url(#logoGrad)"/>
+          <path d="M10 16.5L14 20.5L22 12" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>{{ lang.lang() === 'ar' ? 'إمتحان' : 'Amtihan' }}</span>
       </a>
 
       <div class="nav-links" *ngIf="auth.isLoggedIn">

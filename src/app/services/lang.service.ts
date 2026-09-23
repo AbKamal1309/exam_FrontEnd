@@ -17,7 +17,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'landing.title1': 'Créez, gérez et passez',
     'landing.title2': 'vos examens',
     'landing.title3': 'facilement',
-    'landing.subtitle': 'ExamPlatform vous permet de créer des examens avec questions et réponses, de les partager avec vos étudiants et de suivre leurs performances en temps réel.',
+    'landing.subtitle': 'Amtihan vous permet de créer des examens avec questions et réponses, de les partager avec vos étudiants et de suivre leurs performances en temps réel.',
     'landing.start': 'Commencer gratuitement →',
     'landing.signin': 'Se connecter',
     'landing.stat1': 'En ligne',
@@ -34,10 +34,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'landing.step3.title': 'Suivez les résultats',
     'landing.step3.desc': 'Les candidats passent le test et vous voyez les scores en temps réel.',
     'landing.cta.title': 'Prêt à commencer ?',
-    'landing.cta.desc': 'Rejoignez ExamPlatform et créez votre premier examen en quelques minutes.',
+    'landing.cta.desc': 'Rejoignez Amtihan et créez votre premier examen en quelques minutes.',
     'landing.cta.btn': 'Créer un compte gratuit',
     'landing.cta.already': 'J\'ai déjà un compte',
-    'landing.footer': '© 2026 ExamPlatform. Tous droits réservés.',
+    'landing.footer': '© 2026 Amtihan. Tous droits réservés.',
 
     // Login / Register
     'login.title': 'Connexion',
@@ -1033,7 +1033,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'landing.title1': 'أنشئ وأدر واجتز',
     'landing.title2': 'امتحاناتك',
     'landing.title3': 'بكل سهولة',
-    'landing.subtitle': 'تتيح لك ExamPlatform إنشاء امتحانات بأسئلة وأجوبة ومشاركتها مع طلابك ومتابعة أدائهم في الوقت الفعلي.',
+    'landing.subtitle': 'يتيح لك إمتحان إنشاء امتحانات بأسئلة وأجوبة ومشاركتها مع طلابك ومتابعة أدائهم في الوقت الفعلي.',
     'landing.start': 'ابدأ مجاناً ←',
     'landing.signin': 'تسجيل الدخول',
     'landing.stat1': 'عبر الإنترنت',
@@ -1050,10 +1050,10 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'landing.step3.title': 'تابع النتائج',
     'landing.step3.desc': 'يؤدي المرشحون الاختبار وترى النتائج في الوقت الفعلي.',
     'landing.cta.title': 'هل أنت مستعد للبدء؟',
-    'landing.cta.desc': 'انضم إلى ExamPlatform وأنشئ امتحانك الأول في دقائق.',
+    'landing.cta.desc': 'انضم إلى إمتحان وأنشئ امتحانك الأول في دقائق.',
     'landing.cta.btn': 'إنشاء حساب مجاني',
     'landing.cta.already': 'لدي حساب بالفعل',
-    'landing.footer': '© 2026 ExamPlatform. جميع الحقوق محفوظة.',
+    'landing.footer': '© 2026 إمتحان. جميع الحقوق محفوظة.',
 
     // Login / Register
     'login.title': 'تسجيل الدخول',
