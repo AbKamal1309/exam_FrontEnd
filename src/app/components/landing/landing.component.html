@@ -115,3 +115,15 @@
     </div>
     <p class="footer-copy">{{ lang.t('landing.footer') }}</p>
 </footer>
+
+<a
+  *ngIf="!playBadgeDismissed"
+  [href]="playStoreUrl"
+  target="_blank"
+  rel="noopener"
+  class="play-badge-float"
+  aria-label="Disponible sur Google Play"
+>
+  <button type="button" class="play-badge-close" (click)="dismissPlayBadge($event)" aria-label="Fermer">✕</button>
+  <img [src]="playBadgeImg" alt="Disponible sur Google Play">
+</a>
