@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://exam-backend-noe9.onrender.com'
+  apiUrl: 'https://exambackend-production-9dba.up.railway.app'
 };
